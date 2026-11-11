@@ -1,0 +1,41 @@
+name: Raaz
+options:
+  bundleIdPrefix: app.raaz
+  deploymentTarget: { iOS: "26.0" }
+packages:
+  Firebase:
+    url: https://github.com/firebase/firebase-ios-sdk
+    from: 13.1.1
+targets:
+  Raaz:
+    type: application
+    platform: iOS
+    sources: [Raaz]
+    dependencies:
+      - package: Firebase
+        product: FirebaseAILogic
+      - package: Firebase
+        product: FirebaseAppCheck
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.raaz.detective
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Raaz
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UIUserInterfaceStyle: Dark
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        SWIFT_VERSION: "6.0"
+        SWIFT_STRICT_CONCURRENCY: minimal
+        CODE_SIGN_STYLE: Automatic
+  RaazTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [RaazTests]
+    dependencies: [{ target: Raaz }]
+    settings:
+      base: { GENERATE_INFOPLIST_FILE: YES }
+schemes:
+  Raaz:
+    build: { targets: { Raaz: all, RaazTests: [test] } }
+    test: { targets: [RaazTests] }

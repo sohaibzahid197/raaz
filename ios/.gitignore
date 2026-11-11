@@ -1,0 +1,4 @@
+Raaz/GoogleService-Info.plist
+*.xcodeproj/
+build/
+DerivedData/
