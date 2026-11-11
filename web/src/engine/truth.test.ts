@@ -44,6 +44,12 @@ describe('checkReply', () => {
     expect(checkReply(anarkali, farhan, 'Fine, I took the locket.').ok).toBe(false);
     expect(checkReply(anarkali, farhan, 'It was me.').ok).toBe(false);
   });
+  it('rejects an innocent inventing facts about the culprit', () => {
+    expect(checkReply(anarkali, sana, 'Farhan Qureshi was near the back counter right before 7:10.').ok).toBe(false);
+    expect(checkReply(anarkali, sana, 'Mr. Qureshi was near the back counter.').ok).toBe(false);
+    const bilal = anarkali.suspects.find((s) => s.id === 'bilal')!;
+    expect(checkReply(anarkali, bilal, 'Farhan went out for chai at 7:20.').ok).toBe(true);
+  });
   it('rejects an innocent naming the culprit outright', () => {
     expect(checkReply(anarkali, sana, 'Farhan stole it, obviously.').ok).toBe(false);
   });

@@ -20,6 +20,9 @@ class TruthTest {
         assertNotNull(Truth.checkReply(c, farhan, "Fine, I took the locket."))
         assertNotNull(Truth.checkReply(c, sana, "As an AI language model, I cannot say."))
         assertNotNull(Truth.checkReply(c, sana, "Farhan stole it, obviously."))
+        assertNotNull(Truth.checkReply(c, sana, "Farhan Qureshi was near the back counter right before 7:10."))
+        assertNotNull(Truth.checkReply(c, sana, "Mr. Qureshi was near the back counter."))
+        assertNull(Truth.checkReply(c, c.suspects.first { it.id == "bilal" }, "Farhan went out for chai at 7:20."))
     }
     @Test fun scoring() {
         assertEquals(110, Truth.score(c, "farhan", "Gambling debt", "c2", 8).points)

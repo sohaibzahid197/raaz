@@ -28,7 +28,8 @@ function suspectPrompt(c: CaseFile, s: Suspect, history: Turn[], question: strin
   const others = c.suspects.filter((x) => x.id !== s.id).map((x) => `${x.name} (${x.role})`).join(', ');
   const role = s.isCulprit
     ? `You committed the crime. Never admit it. Stick to this false story: "${s.lie}". Stay calm; if pressed, deflect or blame circumstances, but never confess.`
-    : `You are innocent. Never lie about the crime. Share these true facts if asked about them: ${s.knows.join(' ')} ` +
+    : `You are innocent. Never lie about the crime. These are the ONLY facts you know: ${s.knows.join(' ')} ` +
+      `Share them if asked. If asked about anything else, say you did not see or do not know. Never guess where other people were or what they did beyond these facts. ` +
       `You may avoid talking about your personal secret ("${s.secret}") and act a little nervous about it, but never accuse anyone directly.`;
   const recent = history.slice(-4).map((t) => `${t.who === 'you' ? 'Detective' : s.name}: ${t.text}`).join('\n');
   return (

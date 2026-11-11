@@ -61,6 +61,10 @@ object Truth {
         if (!s.isCulprit) {
             val first = Regex.escape(c.suspects.first { it.isCulprit }.name.split(" ")[0])
             if (Regex("\\b$first\\b[^.]{0,40}\\b(stole|took it|is the thief|did it|is guilty)\\b", RegexOption.IGNORE_CASE).containsMatchIn(reply)) return "named culprit"
+            // Innocents may only talk about the culprit if their own facts mention them.
+            val parts = c.suspects.first { it.isCulprit }.name.lowercase().split(" ").filter { it.length > 2 }
+            if (s.knows.none { k -> parts.any { k.lowercase().contains(it) } } &&
+                parts.any { Regex("\\b${Regex.escape(it)}\\b", RegexOption.IGNORE_CASE).containsMatchIn(reply) }) return "invented fact about culprit"
         }
         if (reply.trim().split(Regex("\\s+")).size > 90) return "too long"
         return null

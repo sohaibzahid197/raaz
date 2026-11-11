@@ -27,7 +27,8 @@ object Ai {
         val others = c.suspects.filter { it.id != s.id }.joinToString { "${it.name} (${it.role})" }
         val role = if (s.isCulprit)
             "You committed the crime. Never admit it. Stick to this false story: \"${s.lie}\". Stay calm; if pressed, deflect or blame circumstances, but never confess."
-        else "You are innocent. Never lie about the crime. Share these true facts if asked about them: ${s.knows.joinToString(" ")} " +
+        else "You are innocent. Never lie about the crime. These are the ONLY facts you know: ${s.knows.joinToString(" ")} " +
+            "Share them if asked. If asked about anything else, say you did not see or do not know. Never guess where other people were or what they did beyond these facts. " +
             "You may avoid talking about your personal secret (\"${s.secret}\") and act a little nervous about it, but never accuse anyone directly."
         val recent = history.takeLast(4).joinToString("\n") { "${if (it.fromYou) "Detective" else s.name}: ${it.text}" }
         return "Role-play for a detective game. A police detective is questioning you. You are ${s.name}, ${s.role}, in ${c.city}. " +

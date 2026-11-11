@@ -36,6 +36,10 @@ export function checkReply(c: CaseFile, s: Suspect, reply: string): ReplyCheck {
     if (new RegExp(`\\b${first}\\b[^.]{0,40}\\b(stole|took it|is the thief|did it|is guilty)\\b`, 'i').test(reply)) {
       return { ok: false, reason: 'named culprit' };
     }
+    // Innocents may only talk about the culprit if their own facts mention them.
+    const parts = culprit.name.toLowerCase().split(/\s+/).filter((p) => p.length > 2);
+    const knowsCulprit = s.knows.some((k) => parts.some((p) => k.toLowerCase().includes(p)));
+    if (!knowsCulprit && parts.some((p) => new RegExp(`\\b${p}\\b`, 'i').test(reply))) return { ok: false, reason: 'invented fact about culprit' };
   }
   if (reply.split(/\s+/).length > 90) return { ok: false, reason: 'too long' };
   return { ok: true };
