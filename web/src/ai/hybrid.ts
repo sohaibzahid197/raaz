@@ -47,7 +47,7 @@ export async function askSuspect(c: CaseFile, s: Suspect, history: Turn[], quest
   let last = { text: '', ranOn: 'device' as RanOn };
   for (const strict of [false, true]) {
     const res = await suspectModel.generateContent(suspectPrompt(c, s, history, question, lang, strict));
-    const text = res.response.text().trim().replace(/^["']|["']$/g, '').replace(new RegExp(`^${s.name}:\\s*`), '');
+    const text = res.response.text().trim().replace(/^["']|["']$/g, '').replace(new RegExp(`^${s.name}:\\s*`), '').replace(/[*_]+/g, '');
     const ranOn: RanOn = res.response.inferenceSource === 'on_device' ? 'device' : 'cloud';
     last = { text, ranOn };
     if (checkReply(c, s, text).ok) return { ...last, retried: strict };

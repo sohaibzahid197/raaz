@@ -44,7 +44,7 @@ object Ai {
         for (strict in listOf(false, true)) {
             val res = model.generateContent(prompt(c, s, history, q, urdu, strict))
             onDevice = res.inferenceSource == InferenceSource.ON_DEVICE
-            val text = (res.text ?: "").trim().trim('"', '\'').removePrefix("${s.name}:").trim()
+            val text = (res.text ?: "").trim().trim('"', '\'').removePrefix("${s.name}:").replace(Regex("[*_]+"), "").trim()
             if (Truth.checkReply(c, s, text) == null) return Reply(text, onDevice, strict)
         }
         return Reply(if (s.isCulprit) "I have told you everything, detective. ${s.lie}" else "I've told you what I know. ${s.knows[0]}", onDevice, true)
