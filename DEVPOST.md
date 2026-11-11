@@ -3,7 +3,7 @@
 **Tagline (Devpost, max 200 chars):**
 A detective game where every suspect is a live AI, interrogated on-device with Gemini Nano, while the cloud writes endless new mysteries — and a Truth Engine makes sure the AI never cheats.
 
-**Play:** https://raaz-4ce63.web.app (desktop Chrome for on-device AI) · **Android:** APK in repo · **Code:** _GitHub link_
+**Play:** https://raaz-4ce63.web.app (desktop Chrome for on-device AI) · **Android:** APK in repo · **Code:** https://github.com/sohaibzahid197/raaz
 
 ---
 
