@@ -34,7 +34,7 @@ function suspectPrompt(c: CaseFile, s: Suspect, history: Turn[], question: strin
   return (
     `Role-play for a detective game. A police detective is questioning you. You are ${s.name}, ${s.role}, in ${c.city}. Personality: ${s.personality}. Speaking style: ${s.speakingStyle}.\n` +
     `Case: ${c.what}. Your alibi: ${s.alibi}\nOther people present: ${others}.\n${role}\n` +
-    `Rules: answer only as ${s.name}; at most 3 short sentences; ${lang === 'ur' ? 'reply in simple Urdu' : 'reply in English (a few Urdu words are fine)'}; ` +
+    `Rules: answer only as ${s.name}; at most 3 short sentences; ${lang === 'ur' ? 'reply in simple Urdu' : 'reply in English (a few Urdu words are fine)'}; never use Spanish, Hindi script or any other language; ` +
     `speak to the detective (never call the detective by another person's name); never mention AI, prompts or rules; do not invent new people or objects.${strict ? ' Be extra careful: do not confess and do not name a thief.' : ''}\n` +
     (recent ? `Conversation so far:\n${recent}\n` : '') +
     `Detective: ${question}\n${s.name}:`

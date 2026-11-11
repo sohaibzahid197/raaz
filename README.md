@@ -41,3 +41,14 @@ $0: Spark plan, Gemini Developer API free tier, on-device inference for most tur
 
 ## License
 Apache-2.0. All cases and people are fictional.
+
+## Android
+`android/` is a native Kotlin + Jetpack Compose app using `firebase-ai` with `firebase-ai-ondevice`
+(`InferenceMode.PREFER_ON_DEVICE`): Gemini Nano via AICore on supported phones, cloud otherwise.
+The Truth Engine is ported to Kotlin (`Truth.kt`) and shares the same case files (`assets/cases.json`).
+```bash
+cd android
+./gradlew testDebugUnitTest assembleDebug
+```
+Put your own `app/google-services.json` in place first. On first launch the debug App Check
+provider logs a token to Logcat; add it in Firebase → App Check → Manage debug tokens.
