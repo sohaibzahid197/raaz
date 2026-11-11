@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,6 +33,7 @@ private val Ok = Color(0xFF79C99E); private val CloudC = Color(0xFF7FB2F0); priv
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge(androidx.activity.SystemBarStyle.dark(android.graphics.Color.TRANSPARENT), androidx.activity.SystemBarStyle.dark(android.graphics.Color.TRANSPARENT))
         val cases = parseCases(assets.open("cases.json").bufferedReader().readText())
         setContent {
             MaterialTheme(colorScheme = darkColorScheme(background = Bg, surface = Paper, primary = Lantern, onPrimary = Color(0xFF1A1208), onSurface = Ink)) {
@@ -53,7 +55,7 @@ private fun Game(cases: List<CaseFile>) {
     val asked = chats.values.sumOf { l -> l.count { it.fromYou } }
     BackHandler(screen != Screen.Home) { screen = if (screen == Screen.Board) Screen.Home else Screen.Board }
 
-    Column(Modifier.fillMaxSize().systemBarsPadding().padding(16.dp)) {
+    Column(Modifier.fillMaxSize().systemBarsPadding().imePadding().padding(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("راز", color = Lantern, fontSize = 30.sp, modifier = Modifier.clickable { screen = Screen.Home })
             Text("  RAAZ", color = Muted, letterSpacing = 4.sp, fontFamily = FontFamily.Serif)
