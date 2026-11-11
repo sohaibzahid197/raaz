@@ -1,0 +1,178 @@
+import type { CaseFile } from './types';
+
+// Three handcrafted starter cases. They ship with the app so Raaz is
+// always playable offline. All people and places in them are fictional.
+
+export const STARTER_CASES: CaseFile[] = [
+  {
+    id: 'anarkali-locket',
+    title: 'The Anarkali Locket',
+    titleUr: 'انارکلی کا لاکٹ',
+    city: 'Lahore',
+    intro:
+      'Anarkali Bazaar, 7:40 pm. A 300-year-old Mughal gold locket has vanished from the locked display case of Mian Jewellers. ' +
+      'The shop closed at 7:00 pm. Four people were inside after closing. One of them is lying.',
+    what: 'A Mughal gold locket stolen from a locked display case',
+    timeline: [
+      '7:00 pm shop closes; locket is in the case (seen by Bilal).',
+      '7:10 pm power cut for 5 minutes; Sana runs the generator.',
+      '7:12 pm Farhan uses the spare key during the dark and takes the locket.',
+      '7:20 pm Farhan leaves "for chai" and hides the locket in his motorbike seat.',
+      '7:35 pm Mian Sahib opens the case and finds it empty.',
+    ],
+    suspects: [
+      {
+        id: 'farhan', name: 'Farhan Qureshi', role: 'Shop manager', personality: 'smooth, confident, helpful on the surface',
+        speakingStyle: 'calm, uses "bhai" and "dekhiye"', alibi: 'Says he was counting cash at the back counter the whole time.',
+        knows: ['The spare key is kept in the back drawer.', 'Bilal saw the locket at closing time.'],
+        secret: 'He owes a large gambling debt to a moneylender in Ichhra.', isCulprit: true,
+        lie: 'I never left the back counter and never touched the spare key. I was counting cash during the power cut.',
+      },
+      {
+        id: 'sana', name: 'Sana Malik', role: 'Accountant', personality: 'precise, nervous, honest',
+        speakingStyle: 'short exact sentences, mentions times', alibi: 'Ran to start the generator when the power went at 7:10.',
+        knows: ['The power cut was at 7:10 and lasted about 5 minutes.', 'When the lights came back, the back counter was empty and the cash box was still closed.'],
+        secret: 'She has been interviewing for a job at a rival jeweller.', isCulprit: false,
+      },
+      {
+        id: 'bilal', name: 'Bilal Ahmed', role: 'Security guard', personality: 'tired, loyal, a bit defensive',
+        speakingStyle: 'simple words, Punjabi flavour', alibi: 'Stood at the front shutter the whole evening.',
+        knows: ['He saw the locket in the case at 7:00 pm.', 'Farhan went out "for chai" at about 7:20 and came back without any tea.', 'Farhan parked his motorbike in the back lane today, not the front.'],
+        secret: 'He dozed off for a minute at around 7:30.', isCulprit: false,
+      },
+      {
+        id: 'mian', name: 'Mian Rashid', role: 'Shop owner', personality: 'proud, angry, worried about insurance',
+        speakingStyle: 'formal, a little dramatic', alibi: 'Was on a phone call with a buyer in his office until 7:35.',
+        knows: ['Only he and the manager have keys to the display case; a spare key is in the back drawer.', 'The spare key was put back in the wrong place.'],
+        secret: 'The insurance on the locket expired last month.', isCulprit: false,
+      },
+    ],
+    clues: [
+      { id: 'c1', text: 'Power cut at 7:10 pm for about 5 minutes; the generator was started by Sana.', from: 'sana', keywords: ['power', 'light', 'bijli', 'generator', 'dark', 'time'] },
+      { id: 'c2', text: 'When the lights came back, the back counter was empty and the cash box was still closed.', from: 'sana', keywords: ['back counter', 'cash box', 'lights came back', 'power came back', 'after the power'], contradicts: 'farhan' },
+      { id: 'c3', text: 'Farhan left "for chai" at 7:20 and came back with no tea.', from: 'bilal', keywords: ['chai', 'tea', 'leave', 'left', 'outside', 'farhan', 'who'] },
+      { id: 'c4', text: 'Farhan parked his motorbike in the back lane today, which he never does.', from: 'bilal', keywords: ['bike', 'motorbike', 'park', 'lane', 'farhan'] },
+      { id: 'c5', text: 'The spare key was put back in the wrong place in the back drawer.', from: 'mian', keywords: ['key', 'drawer', 'spare', 'lock', 'case'] },
+      { id: 'c6', text: 'The locket was in the case at 7:00 pm.', from: 'bilal', keywords: ['locket', 'see', 'saw', 'seven', 'closing'] },
+    ],
+    motives: ['Gambling debt', 'Insurance fraud', 'Revenge on the owner', 'Selling to a rival jeweller'],
+    solution: {
+      culprit: 'farhan', motive: 'Gambling debt', keyClue: 'c2',
+      story: 'Farhan used the 7:10 power cut to take the spare key and empty the case. He claimed he was counting cash at the back counter, but Sana found the counter empty and the cash box closed when the lights returned. He hid the locket in his motorbike seat when he went out "for chai". He needed money for his gambling debt.',
+    },
+  },
+  {
+    id: 'karachi-saffron',
+    title: 'Saffron at Midnight',
+    titleUr: 'آدھی رات کا زعفران',
+    city: 'Karachi',
+    intro:
+      'Karachi Port, 12:30 am. A crate of Iranian saffron worth millions has disappeared from Warehouse 7 between two shift changes. ' +
+      'The gate log shows no truck left. Four people had access. One of them is lying.',
+    what: 'A crate of saffron missing from a locked warehouse',
+    timeline: [
+      '11:00 pm crate counted by Nadia during inventory.',
+      '11:40 pm Javed switches off the CCTV "for maintenance".',
+      '11:50 pm Javed moves the crate into an empty fish-supply van parked inside.',
+      '12:20 am the fish van leaves through Gate B, logged as "empty return".',
+      '12:30 am Captain Rizvi reports the crate missing.',
+    ],
+    suspects: [
+      {
+        id: 'javed', name: 'Javed Baloch', role: 'CCTV technician', personality: 'chatty, eager to help, avoids eye contact',
+        speakingStyle: 'technical words, fast talker', alibi: 'Says he was fixing a broken camera at Gate A from 11:30 to 12:30.',
+        knows: ['The CCTV in Warehouse 7 was off from 11:40.', 'A fish-supply van was parked inside Warehouse 7.'],
+        secret: 'He is paid on the side by a smuggling ring.', isCulprit: true,
+        lie: 'I was at Gate A the whole time fixing a camera. I never went near Warehouse 7 and never switched anything off.',
+      },
+      {
+        id: 'nadia', name: 'Nadia Shaikh', role: 'Inventory officer', personality: 'strict, by-the-book',
+        speakingStyle: 'formal, quotes numbers', alibi: 'Did the 11:00 pm count, then went to the office to file it.',
+        knows: ['The crate was counted at 11:00 pm.', 'The CCTV panel in the office showed Warehouse 7 cameras off from 11:40, switched off with the technician\'s login.'],
+        secret: 'She skipped the 10 pm count and filled it in from memory.', isCulprit: false,
+      },
+      {
+        id: 'imran', name: 'Imran Siddiqui', role: 'Gate B guard', personality: 'sleepy, honest, worried about his job',
+        speakingStyle: 'Karachi slang, "yaar"', alibi: 'Manned Gate B all night.',
+        knows: ['A fish-supply van left Gate B at 12:20 am, logged as "empty return".', 'The van driver said "Javed bhai cleared it".'],
+        secret: 'He let his cousin borrow his gate pass once.', isCulprit: false,
+      },
+      {
+        id: 'rizvi', name: 'Captain Rizvi', role: 'Shift supervisor', personality: 'stern, impatient',
+        speakingStyle: 'military, short orders', alibi: 'Inspected the ships on Berth 3 until 12:25.',
+        knows: ['Nobody fixed any camera at Gate A tonight; Gate A cameras were working all night.', 'He found the crate missing at 12:30.'],
+        secret: 'He left his post for 15 minutes to watch a cricket match.', isCulprit: false,
+      },
+    ],
+    clues: [
+      { id: 'k1', text: 'The crate was counted in Warehouse 7 at 11:00 pm.', from: 'nadia', keywords: ['count', 'crate', 'eleven', 'inventory', 'when'] },
+      { id: 'k2', text: 'Warehouse 7 cameras were switched off at 11:40 with the technician\'s login.', from: 'nadia', keywords: ['cctv', 'camera off', 'switched off', 'login', 'cameras off'], contradicts: 'javed' },
+      { id: 'k3', text: 'Gate A cameras worked all night; nobody repaired anything there.', from: 'rizvi', keywords: ['gate a', 'repair', 'fixed', 'fixing'], contradicts: 'javed' },
+      { id: 'k4', text: 'A fish van left Gate B at 12:20 am, logged as "empty return".', from: 'imran', keywords: ['van', 'truck', 'gate', 'left', 'vehicle', 'leave'] },
+      { id: 'k5', text: 'The van driver said "Javed bhai cleared it".', from: 'imran', keywords: ['driver', 'cleared', 'javed', 'who', 'van'] },
+      { id: 'k6', text: 'A fish-supply van had been parked inside Warehouse 7.', from: 'javed', keywords: ['van', 'parked', 'inside', 'warehouse'] },
+    ],
+    motives: ['Paid by smugglers', 'Covering a counting mistake', 'Insurance claim', 'Grudge against the captain'],
+    solution: {
+      culprit: 'javed', motive: 'Paid by smugglers', keyClue: 'k2',
+      story: 'Javed switched off the Warehouse 7 cameras at 11:40 using his own login, moved the saffron into the fish van parked inside, and cleared the van out through Gate B as an "empty return". His Gate A repair story fails: Captain Rizvi confirms nothing was repaired there. A smuggling ring paid him.',
+    },
+  },
+  {
+    id: 'haveli-necklace',
+    title: 'The Haveli Wedding',
+    titleUr: 'حویلی کی شادی',
+    city: 'Lahore (Walled City)',
+    intro:
+      'An old haveli in the Walled City, the night before a wedding. Dadi Amma\'s emerald necklace, the bride\'s family heirloom, ' +
+      'is missing from her trunk. The baraat arrives in the morning. One of four relatives is lying.',
+    what: 'An emerald heirloom necklace missing from a locked trunk',
+    timeline: [
+      '9:00 pm Dadi Amma shows the necklace to the bride and locks the trunk.',
+      '10:15 pm the mehndi dholki starts on the roof; most guests go up.',
+      '10:30 pm Kamran takes the trunk key from Dadi\'s handbag on the roof.',
+      '10:40 pm Kamran opens the trunk downstairs and pockets the necklace.',
+      '11:30 pm Dadi Amma finds it missing.',
+    ],
+    suspects: [
+      {
+        id: 'kamran', name: 'Kamran (cousin)', role: 'Groom\'s cousin, event planner', personality: 'charming, joking, too relaxed',
+        speakingStyle: 'jokes, English and Urdu mixed', alibi: 'Says he was on the roof playing dhol from 10:15 until 11:30.',
+        knows: ['Dadi keeps the trunk key in her handbag.', 'The dholki was on the roof.'],
+        secret: 'His wedding-planning business is failing and he owes the caterer.', isCulprit: true,
+        lie: 'I never left the roof; I was on the dhol the entire night, ask anyone.',
+      },
+      {
+        id: 'zara', name: 'Zara (bride\'s sister)', role: 'Bride\'s younger sister', personality: 'sharp, observant, a little rude',
+        speakingStyle: 'quick, sarcastic', alibi: 'Was on the roof doing everyone\'s mehndi.',
+        knows: ['The dhol stopped for about 15 minutes around 10:30 and a cousin from Gujranwala played instead.', 'Kamran\'s hands had no mehndi or dhol colour, but he had dust on his kurta like from the storeroom.'],
+        secret: 'She secretly borrowed and stained Dadi\'s silk dupatta.', isCulprit: false,
+      },
+      {
+        id: 'tariq', name: 'Uncle Tariq', role: 'Bride\'s uncle', personality: 'grumpy, suspicious of everyone',
+        speakingStyle: 'complains, old-fashioned', alibi: 'Stayed downstairs watching the news; hates loud music.',
+        knows: ['Around 10:40 he heard the old trunk\'s lid creak in Dadi\'s room.', 'He saw someone in a white kurta go into the storeroom next to Dadi\'s room.'],
+        secret: 'He wanted the necklace to go to his own daughter, and argued with Dadi about it.', isCulprit: false,
+      },
+      {
+        id: 'dadi', name: 'Dadi Amma', role: 'Grandmother', personality: 'wise, emotional, sharp memory',
+        speakingStyle: 'warm, proverbs, calls everyone "beta"', alibi: 'Sat on the roof watching the dholki.',
+        knows: ['She locked the trunk at 9:00 pm and kept the key in her handbag.', 'Her handbag was on the roof chair; Kamran sat next to it and offered to "keep it safe".', 'Kamran wore a white kurta tonight.'],
+        secret: 'She once pawned the necklace years ago during hard times and got it back.', isCulprit: false,
+      },
+    ],
+    clues: [
+      { id: 'h1', text: 'The trunk was locked at 9:00 pm; the key was in Dadi\'s handbag on the roof.', from: 'dadi', keywords: ['key', 'trunk', 'lock', 'handbag', 'bag'] },
+      { id: 'h2', text: 'Kamran sat next to Dadi\'s handbag and offered to "keep it safe".', from: 'dadi', keywords: ['handbag', 'bag', 'kamran', 'who', 'near', 'safe'] },
+      { id: 'h3', text: 'The dhol stopped for about 15 minutes around 10:30; someone else played after.', from: 'zara', keywords: ['dhol', 'music stop', 'stopped', 'who played', 'break'], contradicts: 'kamran' },
+      { id: 'h4', text: 'At about 10:40 the trunk lid creaked in Dadi\'s room downstairs.', from: 'tariq', keywords: ['sound', 'heard', 'trunk', 'downstairs', 'room', 'noise'] },
+      { id: 'h5', text: 'Someone in a white kurta went into the storeroom next to Dadi\'s room.', from: 'tariq', keywords: ['saw', 'see', 'storeroom', 'kurta', 'who', 'someone'] },
+      { id: 'h6', text: 'Kamran had storeroom dust on his white kurta.', from: 'zara', keywords: ['dust', 'kurta', 'kamran', 'clothes', 'dirty', 'white'] },
+    ],
+    motives: ['Business debts', 'Wanted it for his daughter', 'Hiding a stained dupatta', 'Old family grudge'],
+    solution: {
+      culprit: 'kamran', motive: 'Business debts', keyClue: 'h3',
+      story: 'Kamran took the trunk key from Dadi\'s handbag while "keeping it safe", slipped downstairs when the dhol stopped at 10:30, and opened the trunk at 10:40. His alibi of playing dhol all night breaks on Zara\'s memory of the 15-minute break, and storeroom dust on his white kurta places him next to Dadi\'s room. He needed money for his failing business.',
+    },
+  },
+];
