@@ -3,6 +3,8 @@
 A detective game set in Pakistan where **every suspect is an AI**, and one of them is lying.
 Built for **#BuildHybridAI** with Firebase AI Logic hybrid inference.
 
+**Play it:** https://raaz-4ce63.web.app (desktop Chrome for on-device AI)
+
 ## Why hybrid
 | Job | Where it runs | Why |
 |---|---|---|
