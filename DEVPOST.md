@@ -29,6 +29,9 @@ You are a detective in Lahore or Karachi. Four suspects, one crime, one liar.
 - **Infinite cases:** the cloud **Case Writer** creates a brand-new fair mystery for any city and theme in about 6–10 seconds.
 - **Every reply shows where it ran:** 🔒 On-device or ☁️ Cloud.
 - **Works offline:** installable PWA. The 3 built-in cases and on-device suspects play with no internet.
+- **Voice interrogation:** tap 🎤 and question suspects out loud in English or Urdu; each suspect answers in its own voice.
+- **Today's case + leaderboard:** everyone gets the same mystery each day, ranked on a Firestore board.
+- **Classroom mode:** a teacher shares a class code, students solve the same case, and each gets a **Detective skills** report (Questioning, Evidence, Logic, Motive) explaining *how* they reasoned, not just the score.
 
 ## How we built it — the hybrid design
 We split the work by what each side is best at:
@@ -86,11 +89,17 @@ LLMs drift, so in Raaz **the facts live in code, not in the model.**
 - Showing users *where* the AI ran (🔒/☁️) builds trust.
 
 ## What's next
-- Voice interrogation (speech in Urdu and English).
-- Shared daily case: everyone gets the same mystery, with a leaderboard.
-- Classroom mode for critical-thinking and English/Urdu practice.
-- iOS app.
+- Teacher dashboard with per-student reports across a whole term.
 - More cities and regional languages (Punjabi, Sindhi, Pashto).
 
 ## Built with
 firebase-ai-logic, gemini-nano, gemini, chrome-built-in-ai, firebase-app-check, firebase-hosting, react, typescript, vite, pwa, workbox, kotlin, jetpack-compose, android, vitest, junit
+
+## Built during the submission period
+Raaz started as a web prototype and Android port shortly before the submission period opened (Nov 11, 1:30 PM PT); that earlier work (web game, Truth Engine, Android app, a first iOS version) is visible in the git history with its real dates. During the submission period we added:
+- Voice interrogation (speech in, speech out, English and Urdu)
+- Today's case with a Firestore leaderboard and security rules
+- Classroom mode with class boards and the Detective skills reasoning report
+- (list continues as work lands)
+
+We used AI coding assistants (Claude Code) as development tools, as the rules allow. All cases and people are fictional.

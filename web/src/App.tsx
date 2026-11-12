@@ -4,6 +4,9 @@ import { STARTER_CASES } from './engine/cases';
 import { contradictions, revealClues, scoreAccusation, type Score } from './engine/truth';
 import type { CaseFile, Suspect } from './engine/types';
 import { askSuspect, writeCase, type RanOn, type Turn } from './ai/hybrid';
+import { canListen, canSpeak, listen, speak, stopSpeaking } from './ai/voice';
+import { boardId, submitScore, topScores, type Entry } from './ai/leaderboard';
+import { dailyCase, dayKey, normalizeClassCode, reasoningReport } from './engine/daily';
 
 type Lang = 'en' | 'ur';
 type Screen = 'home' | 'board' | 'talk' | 'accuse' | 'result';
@@ -18,6 +21,11 @@ const L = {
     story: 'What really happened', again: 'Back to case files', questions: 'Questions asked', device: 'On-device', cloud: 'Cloud',
     starter: 'Built-in (offline)', generated: 'Written by Case Writer', writeErr: 'Case Writer needs internet. Starter cases still work offline.',
     hints: ['Where were you when it happened?', 'Who else was there?', 'What did you see?'],
+    today: "Today's case", todaySub: 'Same mystery for everyone today. Top detectives make the board.', board: 'Leaderboard',
+    noScores: 'No scores yet. Be the first.', classroom: 'Classroom mode', classSub: 'Teachers: give students a class code. Everyone plays today\'s case and you see the class board and each student\'s reasoning.',
+    name: 'Your name', code: 'Class code (optional)', viewClass: 'Show class board', badCode: 'Use 4–8 letters or numbers.',
+    listen: 'Speak your question', listening: 'Listening…', voiceOn: 'Voice on', voiceOff: 'Voice off',
+    report: 'Detective skills', post: 'Post score to board', posted: 'Score posted', postErr: 'Could not post (offline?)',
   },
   ur: {
     tag: 'ہر مشتبہ ایک اے آئی ہے۔ ان میں سے ایک جھوٹ بول رہا ہے۔', cases: 'کیس فائلیں', play: 'کیس کھولیں', newCase: 'نیا کیس لکھیں',
@@ -28,12 +36,31 @@ const L = {
     story: 'اصل میں کیا ہوا', again: 'کیس فائلوں پر واپس', questions: 'سوالات', device: 'فون پر', cloud: 'کلاؤڈ',
     starter: 'بلٹ اِن (آف لائن)', generated: 'کیس رائٹر کا لکھا ہوا', writeErr: 'کیس رائٹر کو انٹرنیٹ چاہیے۔ پرانے کیس آف لائن چلتے ہیں۔',
     hints: ['واقعے کے وقت آپ کہاں تھے؟', 'اور کون موجود تھا؟', 'آپ نے کیا دیکھا؟'],
+    today: 'آج کا کیس', todaySub: 'آج سب کے لیے ایک ہی معمہ۔ بہترین جاسوس بورڈ پر۔', board: 'لیڈر بورڈ',
+    noScores: 'ابھی کوئی سکور نہیں۔ پہلے آپ بنیں۔', classroom: 'کلاس روم موڈ', classSub: 'استاد طلبہ کو کلاس کوڈ دیں۔ سب آج کا کیس کھیلیں اور آپ کلاس بورڈ اور ہر طالب علم کی سوچ دیکھیں۔',
+    name: 'آپ کا نام', code: 'کلاس کوڈ (اختیاری)', viewClass: 'کلاس بورڈ دیکھیں', badCode: '4 سے 8 حروف یا ہندسے۔',
+    listen: 'بول کر پوچھیں', listening: 'سن رہا ہے…', voiceOn: 'آواز آن', voiceOff: 'آواز بند',
+    report: 'جاسوسی مہارتیں', post: 'سکور بورڈ پر بھیجیں', posted: 'سکور بھیج دیا', postErr: 'نہیں بھیج سکے (آف لائن؟)',
   },
 };
 
 function Badge({ on, t }: { on?: RanOn; t: typeof L.en }) {
   if (!on) return null;
   return <span className={`badge badge-${on}`}>{on === 'device' ? `🔒 ${t.device}` : `☁️ ${t.cloud}`}</span>;
+}
+
+const ls = (k: string, d = '') => { try { return localStorage.getItem(k) ?? d; } catch { return d; } };
+const lsSet = (k: string, v: string) => { try { localStorage.setItem(k, v); } catch { /* private mode */ } };
+
+function Board({ title, rows, t }: { title: string; rows: Entry[] | null; t: typeof L.en }) {
+  return (
+    <section className="card board">
+      <h3>🏆 {title}</h3>
+      {rows === null ? <p className="muted small">…</p> : rows.length === 0 ? <p className="muted small">{t.noScores}</p> : (
+        <ol>{rows.map((r, i) => <li key={i}><span>{r.name}</span><b>{r.points}</b><span className="muted small">{r.questions} Q</span></li>)}</ol>
+      )}
+    </section>
+  );
 }
 
 const loadGenerated = (): CaseFile[] => {
@@ -60,6 +87,17 @@ export default function App() {
   const [acc, setAcc] = useState({ suspectId: '', motive: '', clueId: '' });
   const [score, setScore] = useState<Score | null>(null);
   const chatEnd = useRef<HTMLDivElement>(null);
+  const today = dayKey();
+  const daily = useMemo(() => dailyCase(STARTER_CASES, today), [today]);
+  const [isDaily, setIsDaily] = useState(false);
+  const [player, setPlayer] = useState(() => ls('raaz.name'));
+  const [codeInput, setCodeInput] = useState(() => ls('raaz.class'));
+  const classCode = normalizeClassCode(codeInput);
+  const [rows, setRows] = useState<Entry[] | null>(null);
+  const [classRows, setClassRows] = useState<Entry[] | null>(null);
+  const [posted, setPosted] = useState<'' | 'ok' | 'err'>('');
+  const [voice, setVoice] = useState(() => ls('raaz.voice') === '1');
+  const [hearing, setHearing] = useState(false);
 
   useEffect(() => {
     const up = () => setOnline(true), down = () => setOnline(false);
@@ -68,10 +106,22 @@ export default function App() {
   }, []);
   useEffect(() => { chatEnd.current?.scrollIntoView({ behavior: 'smooth' }); }, [talks, busy]);
 
+  useEffect(() => {
+    if (screen !== 'home' || !online) return;
+    topScores(boardId(today)).then(setRows).catch(() => setRows([]));
+  }, [screen, online, today]);
+  function loadClass() {
+    if (!classCode) return;
+    lsSet('raaz.class', classCode);
+    setClassRows(null);
+    topScores(boardId(today, classCode)).then(setClassRows).catch(() => setClassRows([]));
+  }
+
   const flags = useMemo(() => (cf ? contradictions(cf, found) : []), [cf, found]);
   const flagged = new Set(flags.map((f) => f.suspectId));
 
-  function open(c: CaseFile) {
+  function open(c: CaseFile, dailyMode = false) {
+    setIsDaily(dailyMode); setPosted(''); stopSpeaking();
     setCf(c); setTalks({}); setFound([]); setAsked(0); setScore(null); setAcc({ suspectId: '', motive: '', clueId: '' }); setScreen('board');
   }
 
@@ -84,12 +134,34 @@ export default function App() {
     try {
       const r = await askSuspect(cf, current, hist, text, lang);
       setTalks((tk) => ({ ...tk, [current.id]: [...withQ, { who: 'suspect', text: r.text, ranOn: r.ranOn }] }));
+      if (voice) speak(r.text, lang, cf.suspects.indexOf(current));
     } catch (e) {
       console.warn(e);
       setTalks((tk) => ({ ...tk, [current.id]: [...withQ, { who: 'suspect', text: '…' }] }));
     }
     if (newClues.length) setFound((f) => [...f, ...newClues.map((c) => c.id)]);
     setBusy(false);
+  }
+
+  async function hear() {
+    if (hearing) return;
+    setHearing(true); stopSpeaking();
+    const text = await listen(lang).done;
+    setHearing(false);
+    if (text) send(text);
+  }
+
+  async function post() {
+    if (!score || !player.trim()) return;
+    lsSet('raaz.name', player.trim());
+    try {
+      const e = { name: player.trim(), points: score.points, questions: Math.max(1, asked) };
+      await submitScore(boardId(today), e);
+      if (classCode) await submitScore(boardId(today, classCode), e);
+      setPosted('ok');
+      topScores(boardId(today)).then(setRows).catch(() => setRows([]));
+      if (classCode) topScores(boardId(today, classCode)).then(setClassRows).catch(() => setClassRows([]));
+    } catch (err) { console.warn(err); setPosted('err'); }
   }
 
   async function newCase() {
@@ -125,6 +197,13 @@ export default function App() {
       {screen === 'home' && (
         <main>
           <p className="tagline">{t.tag}</p>
+          <button className="case-card today" onClick={() => open(daily, true)}>
+            <span className="muted small">⭐ {t.today} · {today}</span>
+            <span className="case-ur">{daily.titleUr}</span>
+            <b>{daily.title}</b>
+            <span className="muted">{t.todaySub}</span>
+          </button>
+          {online && <Board title={`${t.board} · ${today}`} rows={rows} t={t} />}
           <h2>{t.cases}</h2>
           <div className="cases">
             {[...generated, ...STARTER_CASES].map((c) => (
@@ -145,6 +224,17 @@ export default function App() {
             </div>
             <button className="primary" disabled={!online || writing} onClick={newCase}>{writing ? t.writing : t.newCase}</button>
             {writeMsg && <p className="warn">{writeMsg}</p>}
+          </section>
+          <section className="card">
+            <h3>🎓 {t.classroom}</h3>
+            <p className="muted small">{t.classSub}</p>
+            <div className="row">
+              <label>{t.name}<input value={player} maxLength={20} onChange={(e) => setPlayer(e.target.value)} /></label>
+              <label>{t.code}<input value={codeInput} maxLength={8} onChange={(e) => setCodeInput(e.target.value)} placeholder="LHR7B" /></label>
+            </div>
+            {codeInput && !classCode && <p className="warn">{t.badCode}</p>}
+            <button className="primary" disabled={!classCode || !online} onClick={loadClass}>{t.viewClass}</button>
+            {classCode && classRows && <Board title={`${t.classroom} · ${classCode}`} rows={classRows} t={t} />}
           </section>
         </main>
       )}
@@ -177,6 +267,7 @@ export default function App() {
           <div className="talk-head">
             <button className="ghost" onClick={() => setScreen('board')}>{t.back}</button>
             <div><b>{current.name}</b><div className="muted small">{current.role}</div></div>
+            {canSpeak && <button className="ghost" onClick={() => { const v = !voice; setVoice(v); lsSet('raaz.voice', v ? '1' : '0'); if (!v) stopSpeaking(); }}>{voice ? `🔊 ${t.voiceOn}` : `🔈 ${t.voiceOff}`}</button>}
             <span className="avatar">{current.name[0]}</span>
           </div>
           <div className="chat">
@@ -193,7 +284,8 @@ export default function App() {
             <div className="hints">{t.hints.map((h) => <button key={h} className="chip" onClick={() => send(h)}>{h}</button>)}</div>
           )}
           <form className="ask" onSubmit={(e) => { e.preventDefault(); send(q); }}>
-            <input value={q} placeholder={t.askPh} onChange={(e) => setQ(e.target.value)} disabled={busy} />
+            {canListen && <button type="button" className={`mic ${hearing ? 'on' : ''}`} title={t.listen} aria-label={t.listen} onClick={hear} disabled={busy}>{hearing ? '●' : '🎤'}</button>}
+            <input value={q} placeholder={hearing ? t.listening : t.askPh} onChange={(e) => setQ(e.target.value)} disabled={busy || hearing} />
             <button className="primary" disabled={busy || !q.trim()}>{t.ask}</button>
           </form>
         </main>
@@ -228,6 +320,24 @@ export default function App() {
             <p className="big">{score.points}/{score.max} · {score.rank}</p>
             <p className="muted">{t.questions}: {asked} · {t.motive} {score.motive ? '✔' : '✘'} · {t.proof} {score.clue ? '✔' : '✘'}</p>
           </section>
+          <section className="card report">
+            <h3>🧠 {t.report}</h3>
+            {reasoningReport(cf, acc, score, asked, found).map((k) => (
+              <div key={k.key} className="skill"><b>{k.label}</b><span className="stars">{'★'.repeat(k.stars)}{'☆'.repeat(3 - k.stars)}</span><p className="muted small">{k.tip}</p></div>
+            ))}
+          </section>
+          {isDaily && online && (
+            <section className="card">
+              <div className="row">
+                <label>{t.name}<input value={player} maxLength={20} onChange={(e) => setPlayer(e.target.value)} /></label>
+                <label>{t.code}<input value={codeInput} maxLength={8} onChange={(e) => setCodeInput(e.target.value)} /></label>
+              </div>
+              <button className="primary" disabled={!player.trim() || posted === 'ok' || (!!codeInput && !classCode)} onClick={post}>{posted === 'ok' ? `✔ ${t.posted}` : t.post}</button>
+              {posted === 'err' && <p className="warn">{t.postErr}</p>}
+              {posted === 'ok' && <Board title={`${t.board} · ${today}`} rows={rows} t={t} />}
+              {posted === 'ok' && classCode && <Board title={`${t.classroom} · ${classCode}`} rows={classRows} t={t} />}
+            </section>
+          )}
           <section className="casefile">
             <span className="stamp">{t.story}</span>
             <p>{cf.solution.story}</p>

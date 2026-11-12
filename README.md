@@ -26,6 +26,9 @@ LLMs drift, so the facts live in code, not the model (`web/src/engine/truth.ts`)
 - English / اردو
 - Installable PWA, plays offline
 - Notebook, hints, accusation and reveal
+- **Voice interrogation**: tap 🎤 and ask out loud in English or Urdu; turn on 🔊 and each suspect answers in its own voice (Web Speech API, free, in the browser)
+- **Today's case + leaderboard**: everyone gets the same mystery each day; scores go to a Firestore board (anonymous auth, validated by security rules in `firestore.rules`)
+- **Classroom mode**: a teacher shares a class code; students post to a class board, and every player gets a **Detective skills** report (Questioning, Evidence, Logic, Motive) that explains their reasoning (`web/src/engine/daily.ts`)
 
 ## Run it
 ```bash
@@ -33,9 +36,9 @@ cd web
 cp .env.example .env   # fill in your Firebase web config
 npm install
 npm run dev
-npm test               # 13 Truth Engine tests
+npm test               # 20 tests: Truth Engine, daily case, classroom report
 ```
-Firebase setup: enable **AI Logic** (Gemini Developer API), **App Check**, **Anonymous Auth**. Spark (free) plan is enough.
+Firebase setup: enable **AI Logic** (Gemini Developer API), **App Check**, **Anonymous Auth**, **Firestore** (`firebase deploy --only firestore` for rules and index). Spark (free) plan is enough.
 For on-device AI use desktop Chrome with the Prompt API / Gemini Nano available.
 
 ## Cost
@@ -54,3 +57,14 @@ cd android
 ```
 Put your own `app/google-services.json` in place first. On first launch the debug App Check
 provider logs a token to Logcat; add it in Firebase → App Check → Manage debug tokens.
+
+## iOS
+`ios/` is a native SwiftUI app. Suspects run on **Apple's on-device Foundation Model** when Apple Intelligence
+is available 🔒, and fall back to Gemini in the cloud through **Firebase AI Logic** (`FirebaseAILogic`) ☁️.
+The Truth Engine is ported to Swift (`Truth.swift`) with the same case files.
+```bash
+cd ios
+brew install xcodegen && xcodegen generate
+open Raaz.xcodeproj   # add your own GoogleService-Info.plist to Raaz/
+```
+The debug App Check provider prints a token in the Xcode console; add it in Firebase → App Check.
