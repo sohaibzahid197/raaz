@@ -5,29 +5,32 @@ import FoundationModels
 struct Turn: Identifiable, Hashable { let id = UUID(); let fromYou: Bool; let text: String; var onDevice: Bool? = nil }
 struct Reply { let text: String; let onDevice: Bool; let retried: Bool }
 
-/// Hybrid suspects: Apple's on-device Foundation Model first, Gemini in the cloud (Firebase AI Logic) as fallback.
-/// (Firebase's built-in iOS hybrid wrapper needs iOS 27; this is the same prefer-on-device policy for iOS 26.)
+/// Hybrid suspects through one API: Apple's Foundation Models `LanguageModelSession`.
+/// On-device: Apple's SystemLanguageModel (Apple Intelligence) 🔒.
+/// Cloud: Firebase AI Logic's `GeminiLanguageModel`, which plugs Gemini into the same Foundation Models API ☁️.
+/// Policy = prefer on-device, fall back to cloud when Apple Intelligence is unavailable or refuses.
 enum Ai {
     static let chatModel = "gemini-3.5-flash-lite"
-    private static let cloud = FirebaseAI.firebaseAI(backend: .googleAI()).generativeModel(
-        modelName: chatModel, generationConfig: GenerationConfig(temperature: 0.8, maxOutputTokens: 200))
+    private static let ai = FirebaseAI.firebaseAI(backend: .googleAI())
+    private static let cloudModel = ai.geminiLanguageModel(name: chatModel)
 
     static var onDeviceAvailable: Bool { SystemLanguageModel.default.isAvailable }
     static var onDeviceStatus: String {
-        onDeviceAvailable ? "Apple on-device model ready 🔒" : "On-device model unavailable here: using Gemini cloud ☁️"
+        onDeviceAvailable ? "Apple on-device model ready 🔒" : "On-device model unavailable here: using Gemini via Firebase ☁️"
     }
 
-    /// PREFER_ON_DEVICE: try Apple's model, fall back to Firebase AI Logic cloud on unavailability or error.
+    private static let options = GenerationOptions(temperature: 0.8, maximumResponseTokens: 200)
+
     private static func generate(_ prompt: String) async throws -> (String, Bool) {
         if onDeviceAvailable {
             do {
-                let session = LanguageModelSession()  // fresh per question: need-to-know context lives in the prompt
-                let r = try await session.respond(to: prompt, options: GenerationOptions(temperature: 0.8, maximumResponseTokens: 200))
+                // Fresh session per question: the need-to-know case slice lives in the prompt.
+                let r = try await LanguageModelSession(model: SystemLanguageModel.default).respond(to: prompt, options: options)
                 return (r.content, true)
-            } catch { /* guardrail refusal, context limit, etc. → cloud */ }
+            } catch { /* guardrail refusal, context limit, model not ready → cloud */ }
         }
-        let r = try await cloud.generateContent(prompt)
-        return (r.text ?? "", false)
+        let r = try await LanguageModelSession(model: cloudModel).respond(to: prompt, options: options)
+        return (r.content, false)
     }
 
     static func prompt(_ c: CaseFile, _ s: Suspect, _ history: [Turn], _ q: String, urdu: Bool, strict: Bool) -> String {

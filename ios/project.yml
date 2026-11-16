@@ -1,7 +1,7 @@
 name: Raaz
 options:
   bundleIdPrefix: app.raaz
-  deploymentTarget: { iOS: "26.0" }
+  deploymentTarget: { iOS: "27.0" }
 packages:
   Firebase:
     url: https://github.com/firebase/firebase-ios-sdk
