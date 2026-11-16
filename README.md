@@ -60,7 +60,9 @@ provider logs a token to Logcat; add it in Firebase → App Check → Manage deb
 
 ## iOS
 `ios/` is a native SwiftUI app. Suspects run on **Apple's on-device Foundation Model** when Apple Intelligence
-is available 🔒, and fall back to Gemini in the cloud through **Firebase AI Logic** (`FirebaseAILogic`) ☁️.
+is available 🔒, and fall back to Gemini in the cloud ☁️ through **Firebase AI Logic**'s `GeminiLanguageModel`,
+which plugs into Apple's `LanguageModelSession`, so both paths use the same Foundation Models API.
+Requires Xcode 27 and iOS 27.
 The Truth Engine is ported to Swift (`Truth.swift`) with the same case files.
 ```bash
 cd ios

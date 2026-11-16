@@ -100,6 +100,7 @@ Raaz started as a web prototype and Android port shortly before the submission p
 - Voice interrogation (speech in, speech out, English and Urdu)
 - Today's case with a Firestore leaderboard and security rules
 - Classroom mode with class boards and the Detective skills reasoning report
+- **iOS on Firebase's official hybrid bridge:** Raaz iOS now uses Apple's Foundation Models `LanguageModelSession` for both paths: Apple's on-device model 🔒 and Gemini via Firebase AI Logic's `GeminiLanguageModel` ☁️ (iOS 27 / Xcode 27).
 - (list continues as work lands)
 
 We used AI coding assistants (Claude Code) as development tools, as the rules allow. All cases and people are fictional.
