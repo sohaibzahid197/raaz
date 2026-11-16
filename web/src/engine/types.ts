@@ -5,6 +5,8 @@ export interface Suspect {
   id: string;
   name: string;
   role: string;          // e.g. "Shop assistant"
+  /** Used to pick a matching voice. */
+  gender?: 'female' | 'male';
   personality: string;   // short, for the persona
   speakingStyle: string; // e.g. "polite, mixes Urdu words"
   alibi: string;         // what they say they were doing

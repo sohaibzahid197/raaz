@@ -4,7 +4,7 @@ import { STARTER_CASES } from './engine/cases';
 import { contradictions, revealClues, scoreAccusation, type Score } from './engine/truth';
 import type { CaseFile, Suspect } from './engine/types';
 import { askSuspect, writeCase, type RanOn, type Turn } from './ai/hybrid';
-import { canListen, canSpeak, listen, speak, stopSpeaking } from './ai/voice';
+import { canListen, canSpeak, genderOf, listen, speak, stopSpeaking } from './ai/voice';
 import { boardId, submitScore, topScores, type Entry } from './ai/leaderboard';
 import { dailyCase, dayKey, normalizeClassCode, reasoningReport } from './engine/daily';
 
@@ -134,7 +134,7 @@ export default function App() {
     try {
       const r = await askSuspect(cf, current, hist, text, lang);
       setTalks((tk) => ({ ...tk, [current.id]: [...withQ, { who: 'suspect', text: r.text, ranOn: r.ranOn }] }));
-      if (voice) speak(r.text, lang, cf.suspects.indexOf(current));
+      if (voice) speak(r.text, lang, cf.suspects.indexOf(current), genderOf(current));
     } catch (e) {
       console.warn(e);
       setTalks((tk) => ({ ...tk, [current.id]: [...withQ, { who: 'suspect', text: '…' }] }));

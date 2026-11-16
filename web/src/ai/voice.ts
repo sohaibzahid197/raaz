@@ -23,25 +23,50 @@ export function listen(lang: Lang): { done: Promise<string>; stop: () => void } 
   return { done, stop: () => r.stop() };
 }
 
-/** Pick a voice for the language; male/female varied by suspect so each sounds different. */
-function pickVoice(lang: Lang, seed: number): SpeechSynthesisVoice | undefined {
+export type Gender = 'female' | 'male';
+
+// Browsers don't expose a voice's gender, so we match well-known voice names.
+const FEMALE = /female|samantha|karen|moira|tessa|veena|lekha|kanya|victoria|allison|ava|susan|zira|heera|kalpana|swara|catherine|martha|kathy|nicky|serena|fiona|neerja|uzma|salma/i;
+const MALE = /\bmale|daniel|rishi|alex|fred|aaron|arthur|gordon|ralph|thomas|oliver|david|mark|ravi|hemant|prabhat|madhur|asad|george|rocko|reed|eddy/i;
+const MALE_A_NAMES = /^(mustafa|raza|hamza|musa|taha|yahya|isa|murtaza|mujtaba|ata|baba|abba|dada|chacha|mama)$/i;
+
+/** Gender for a suspect: from the case file, else guessed from the first name (older AI-written cases). */
+export function genderOf(s: { name: string; gender?: Gender }): Gender {
+  if (s.gender === 'female' || s.gender === 'male') return s.gender;
+  const words = s.name.toLowerCase().replace(/'[^']*'|\([^)]*\)/g, ' ').split(/\s+/).filter(Boolean);
+  if (words.some((w) => /^(dadi|nani|ammi|amma|begum|bibi|apa|baji|khala|phuppo|mrs|miss|ms)$/.test(w))) return 'female';
+  const first = words.find((w) => !/^(uncle|captain|dr|mr|chacha|haji|sheikh|syed)$/.test(w)) ?? '';
+  return /(a|ah|ee|i)$/.test(first) && !MALE_A_NAMES.test(first) && !/^(ali|ghazi|qazi|hadi|wali|sami|nabi)$/.test(first) ? 'female' : 'male';
+}
+
+/** Pick a voice for the language and gender; vary between voices so suspects sound different. */
+function pickVoice(lang: Lang, gender: Gender, seed: number): SpeechSynthesisVoice | undefined {
   const all = speechSynthesis.getVoices();
   const want = lang === 'ur' ? ['ur', 'hi'] : ['en-IN', 'en-GB', 'en'];
+  const match = gender === 'female' ? FEMALE : MALE;
+  const other = gender === 'female' ? MALE : FEMALE;
   for (const w of want) {
     const vs = all.filter((v) => v.lang.toLowerCase().startsWith(w.toLowerCase()));
+    const exact = vs.filter((v) => match.test(v.name) && !(gender === 'female' && /\bmale/i.test(v.name.replace(/female/i, ''))));
+    if (exact.length) return exact[seed % exact.length];
+  }
+  // No named match: any voice for the language that isn't clearly the other gender (pitch does the rest).
+  for (const w of want) {
+    const vs = all.filter((v) => v.lang.toLowerCase().startsWith(w.toLowerCase()) && !other.test(v.name));
     if (vs.length) return vs[seed % vs.length];
   }
   return undefined;
 }
 
-export function speak(text: string, lang: Lang, seed = 0) {
+export function speak(text: string, lang: Lang, seed = 0, gender: Gender = 'male') {
   if (!canSpeak) return;
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
   u.lang = locale(lang);
-  const v = pickVoice(lang, seed);
+  const v = pickVoice(lang, gender, seed);
   if (v) u.voice = v;
-  u.pitch = 0.85 + (seed % 4) * 0.1; // each suspect gets a slightly different voice
+  // Small per-suspect variation, centred higher for women and lower for men.
+  u.pitch = (gender === 'female' ? 1.15 : 0.85) + (seed % 3) * 0.07;
   u.rate = 0.98;
   speechSynthesis.speak(u);
 }

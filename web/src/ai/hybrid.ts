@@ -61,7 +61,7 @@ export async function writeCase(city: string, theme: string): Promise<{ caseFile
   const schema =
     `{"id":"kebab-id","title":"","titleUr":"Urdu title","city":"","intro":"2-3 sentences for the player, end with 'One of them is lying.'","what":"",` +
     `"timeline":["true events with times"],` +
-    `"suspects":[{"id":"firstname-lowercase","name":"","role":"","personality":"","speakingStyle":"","alibi":"","knows":["true facts"],"secret":"","isCulprit":false,"lie":"only for culprit"}],` +
+    `"suspects":[{"id":"firstname-lowercase","name":"","gender":"female or male","role":"","personality":"","speakingStyle":"","alibi":"","knows":["true facts"],"secret":"","isCulprit":false,"lie":"only for culprit"}],` +
     `"clues":[{"id":"x1","text":"","from":"suspect id","keywords":["lowercase words a player might ask"],"contradicts":"culprit id or omit"}],` +
     `"motives":["4 options, one true"],"solution":{"culprit":"id","motive":"exactly one of motives","keyClue":"clue id that contradicts culprit","story":"3 sentences"}}`;
   const prompt =

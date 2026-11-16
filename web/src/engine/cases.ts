@@ -22,26 +22,26 @@ export const STARTER_CASES: CaseFile[] = [
     ],
     suspects: [
       {
-        id: 'farhan', name: 'Farhan Qureshi', role: 'Shop manager', personality: 'smooth, confident, helpful on the surface',
+        id: 'farhan', gender: 'male', name: 'Farhan Qureshi', role: 'Shop manager', personality: 'smooth, confident, helpful on the surface',
         speakingStyle: 'calm, uses "bhai" and "dekhiye"', alibi: 'Says he was counting cash at the back counter the whole time.',
         knows: ['The spare key is kept in the back drawer.', 'Bilal saw the locket at closing time.'],
         secret: 'He owes a large gambling debt to a moneylender in Ichhra.', isCulprit: true,
         lie: 'I never left the back counter and never touched the spare key. I was counting cash during the power cut.',
       },
       {
-        id: 'sana', name: 'Sana Malik', role: 'Accountant', personality: 'precise, nervous, honest',
+        id: 'sana', gender: 'female', name: 'Sana Malik', role: 'Accountant', personality: 'precise, nervous, honest',
         speakingStyle: 'short exact sentences, mentions times', alibi: 'Ran to start the generator when the power went at 7:10.',
         knows: ['The power cut was at 7:10 and lasted about 5 minutes.', 'When the lights came back, the back counter was empty and the cash box was still closed.'],
         secret: 'She has been interviewing for a job at a rival jeweller.', isCulprit: false,
       },
       {
-        id: 'bilal', name: 'Bilal Ahmed', role: 'Security guard', personality: 'tired, loyal, a bit defensive',
+        id: 'bilal', gender: 'male', name: 'Bilal Ahmed', role: 'Security guard', personality: 'tired, loyal, a bit defensive',
         speakingStyle: 'simple words, Punjabi flavour', alibi: 'Stood at the front shutter the whole evening.',
         knows: ['He saw the locket in the case at 7:00 pm.', 'Farhan went out "for chai" at about 7:20 and came back without any tea.', 'Farhan parked his motorbike in the back lane today, not the front.'],
         secret: 'He dozed off for a minute at around 7:30.', isCulprit: false,
       },
       {
-        id: 'mian', name: 'Mian Rashid', role: 'Shop owner', personality: 'proud, angry, worried about insurance',
+        id: 'mian', gender: 'male', name: 'Mian Rashid', role: 'Shop owner', personality: 'proud, angry, worried about insurance',
         speakingStyle: 'formal, a little dramatic', alibi: 'Was on a phone call with a buyer in his office until 7:35.',
         knows: ['Only he and the manager have keys to the display case; a spare key is in the back drawer.', 'The spare key was put back in the wrong place.'],
         secret: 'The insurance on the locket expired last month.', isCulprit: false,
@@ -79,26 +79,26 @@ export const STARTER_CASES: CaseFile[] = [
     ],
     suspects: [
       {
-        id: 'javed', name: 'Javed Baloch', role: 'CCTV technician', personality: 'chatty, eager to help, avoids eye contact',
+        id: 'javed', gender: 'male', name: 'Javed Baloch', role: 'CCTV technician', personality: 'chatty, eager to help, avoids eye contact',
         speakingStyle: 'technical words, fast talker', alibi: 'Says he was fixing a broken camera at Gate A from 11:30 to 12:30.',
         knows: ['The CCTV in Warehouse 7 was off from 11:40.', 'A fish-supply van was parked inside Warehouse 7.'],
         secret: 'He is paid on the side by a smuggling ring.', isCulprit: true,
         lie: 'I was at Gate A the whole time fixing a camera. I never went near Warehouse 7 and never switched anything off.',
       },
       {
-        id: 'nadia', name: 'Nadia Shaikh', role: 'Inventory officer', personality: 'strict, by-the-book',
+        id: 'nadia', gender: 'female', name: 'Nadia Shaikh', role: 'Inventory officer', personality: 'strict, by-the-book',
         speakingStyle: 'formal, quotes numbers', alibi: 'Did the 11:00 pm count, then went to the office to file it.',
         knows: ['The crate was counted at 11:00 pm.', 'The CCTV panel in the office showed Warehouse 7 cameras off from 11:40, switched off with the technician\'s login.'],
         secret: 'She skipped the 10 pm count and filled it in from memory.', isCulprit: false,
       },
       {
-        id: 'imran', name: 'Imran Siddiqui', role: 'Gate B guard', personality: 'sleepy, honest, worried about his job',
+        id: 'imran', gender: 'male', name: 'Imran Siddiqui', role: 'Gate B guard', personality: 'sleepy, honest, worried about his job',
         speakingStyle: 'Karachi slang, "yaar"', alibi: 'Manned Gate B all night.',
         knows: ['A fish-supply van left Gate B at 12:20 am, logged as "empty return".', 'The van driver said "Javed bhai cleared it".'],
         secret: 'He let his cousin borrow his gate pass once.', isCulprit: false,
       },
       {
-        id: 'rizvi', name: 'Captain Rizvi', role: 'Shift supervisor', personality: 'stern, impatient',
+        id: 'rizvi', gender: 'male', name: 'Captain Rizvi', role: 'Shift supervisor', personality: 'stern, impatient',
         speakingStyle: 'military, short orders', alibi: 'Inspected the ships on Berth 3 until 12:25.',
         knows: ['Nobody fixed any camera at Gate A tonight; Gate A cameras were working all night.', 'He found the crate missing at 12:30.'],
         secret: 'He left his post for 15 minutes to watch a cricket match.', isCulprit: false,
@@ -136,26 +136,26 @@ export const STARTER_CASES: CaseFile[] = [
     ],
     suspects: [
       {
-        id: 'kamran', name: 'Kamran (cousin)', role: 'Groom\'s cousin, event planner', personality: 'charming, joking, too relaxed',
+        id: 'kamran', gender: 'male', name: 'Kamran (cousin)', role: 'Groom\'s cousin, event planner', personality: 'charming, joking, too relaxed',
         speakingStyle: 'jokes, English and Urdu mixed', alibi: 'Says he was on the roof playing dhol from 10:15 until 11:30.',
         knows: ['Dadi keeps the trunk key in her handbag.', 'The dholki was on the roof.'],
         secret: 'His wedding-planning business is failing and he owes the caterer.', isCulprit: true,
         lie: 'I never left the roof; I was on the dhol the entire night, ask anyone.',
       },
       {
-        id: 'zara', name: 'Zara (bride\'s sister)', role: 'Bride\'s younger sister', personality: 'sharp, observant, a little rude',
+        id: 'zara', gender: 'female', name: 'Zara (bride\'s sister)', role: 'Bride\'s younger sister', personality: 'sharp, observant, a little rude',
         speakingStyle: 'quick, sarcastic', alibi: 'Was on the roof doing everyone\'s mehndi.',
         knows: ['The dhol stopped for about 15 minutes around 10:30 and a cousin from Gujranwala played instead.', 'Kamran\'s hands had no mehndi or dhol colour, but he had dust on his kurta like from the storeroom.'],
         secret: 'She secretly borrowed and stained Dadi\'s silk dupatta.', isCulprit: false,
       },
       {
-        id: 'tariq', name: 'Uncle Tariq', role: 'Bride\'s uncle', personality: 'grumpy, suspicious of everyone',
+        id: 'tariq', gender: 'male', name: 'Uncle Tariq', role: 'Bride\'s uncle', personality: 'grumpy, suspicious of everyone',
         speakingStyle: 'complains, old-fashioned', alibi: 'Stayed downstairs watching the news; hates loud music.',
         knows: ['Around 10:40 he heard the old trunk\'s lid creak in Dadi\'s room.', 'He saw someone in a white kurta go into the storeroom next to Dadi\'s room.'],
         secret: 'He wanted the necklace to go to his own daughter, and argued with Dadi about it.', isCulprit: false,
       },
       {
-        id: 'dadi', name: 'Dadi Amma', role: 'Grandmother', personality: 'wise, emotional, sharp memory',
+        id: 'dadi', gender: 'female', name: 'Dadi Amma', role: 'Grandmother', personality: 'wise, emotional, sharp memory',
         speakingStyle: 'warm, proverbs, calls everyone "beta"', alibi: 'Sat on the roof watching the dholki.',
         knows: ['She locked the trunk at 9:00 pm and kept the key in her handbag.', 'Her handbag was on the roof chair; Kamran sat next to it and offered to "keep it safe".', 'Kamran wore a white kurta tonight.'],
         secret: 'She once pawned the necklace years ago during hard times and got it back.', isCulprit: false,
