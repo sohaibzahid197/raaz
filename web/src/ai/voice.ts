@@ -26,8 +26,8 @@ export function listen(lang: Lang): { done: Promise<string>; stop: () => void } 
 export type Gender = 'female' | 'male';
 
 // Browsers don't expose a voice's gender, so we match well-known voice names.
-const FEMALE = /female|samantha|karen|moira|tessa|veena|lekha|kanya|victoria|allison|ava|susan|zira|heera|kalpana|swara|catherine|martha|kathy|nicky|serena|fiona|neerja|uzma|salma/i;
-const MALE = /\bmale|daniel|rishi|alex|fred|aaron|arthur|gordon|ralph|thomas|oliver|david|mark|ravi|hemant|prabhat|madhur|asad|george|rocko|reed|eddy/i;
+const FEMALE = /female|samantha|karen|moira|tessa|veena|lekha|kanya|victoria|allison|ava|susan|zira|heera|kalpana|swara|catherine|martha|kathy|nicky|serena|fiona|neerja|uzma|salma|flo|sandy|shelley|grandma/i;
+const MALE = /\bmale|daniel|rishi|alex|fred|aaron|arthur|gordon|ralph|thomas|oliver|david|mark|ravi|hemant|prabhat|madhur|asad|george|rocko|reed|eddy|albert|junior|grandpa/i;
 const MALE_A_NAMES = /^(mustafa|raza|hamza|musa|taha|yahya|isa|murtaza|mujtaba|ata|baba|abba|dada|chacha|mama)$/i;
 
 /** Gender for a suspect: from the case file, else guessed from the first name (older AI-written cases). */
@@ -48,7 +48,10 @@ function pickVoice(lang: Lang, gender: Gender, seed: number): SpeechSynthesisVoi
   for (const w of want) {
     const vs = all.filter((v) => v.lang.toLowerCase().startsWith(w.toLowerCase()));
     const exact = vs.filter((v) => match.test(v.name) && !(gender === 'female' && /\bmale/i.test(v.name.replace(/female/i, ''))));
-    if (exact.length) return exact[seed % exact.length];
+    // Prefer voices installed on the device: network voices can fail silently and fall back to a default voice.
+    const local = exact.filter((v) => v.localService);
+    const pool = local.length ? local : exact;
+    if (pool.length) return pool[seed % pool.length];
   }
   // No named match: any voice for the language that isn't clearly the other gender (pitch does the rest).
   for (const w of want) {
