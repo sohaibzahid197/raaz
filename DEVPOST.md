@@ -42,12 +42,21 @@ We split the work by what each side is best at:
 | Writing a whole new case (long structured JSON) | **Cloud**: Gemini Flash-Lite, `PREFER_IN_CLOUD` | Needs a bigger model and world knowledge |
 | Device without Nano | Automatic cloud fallback | Every player gets the full game |
 
+**Three platforms, one hybrid pattern**
+
+| Platform | On-device 🔒 | Cloud ☁️ |
+|---|---|---|
+| Web | Gemini Nano in Chrome, `PREFER_ON_DEVICE` | Gemini via Firebase AI Logic (`PREFER_IN_CLOUD` for the Case Writer) |
+| Android | Gemini Nano via AICore, `OnDeviceConfig(PREFER_ON_DEVICE)` | Gemini via Firebase AI Logic |
+| iOS | Apple Foundation Models (`SystemLanguageModel`) | Firebase AI Logic `GeminiLanguageModel`, in the same Apple `LanguageModelSession` API |
+
 `response.inferenceSource` drives the 🔒/☁️ badge on every message, so the hybrid split is visible, not hidden.
 
 **Stack**
 - **Web:** React + TypeScript + Vite, `firebase/ai` hybrid inference, installable PWA (Workbox) for offline play.
+- **iOS:** native SwiftUI, Apple Foundation Models + `FirebaseAILogic` (`GeminiLanguageModel`), iOS 27.
 - **Android:** native Kotlin + Jetpack Compose, `firebase-ai` + `firebase-ai-ondevice` (Gemini Nano via AICore when available).
-- **Firebase:** AI Logic (Gemini Developer API), App Check (reCAPTCHA in production, so the API can't be abused), Hosting.
+- **Firebase:** AI Logic (Gemini Developer API), App Check (reCAPTCHA in production, so the API can't be abused), Cloud Firestore (daily and class leaderboards, locked down by security rules), anonymous Auth, Hosting.
 - **Cost: $0.** Spark plan, free Gemini Developer API tier, and most turns run on the device.
 
 ## The Truth Engine (what makes it fair)
@@ -68,7 +77,7 @@ LLMs drift, so in Raaz **the facts live in code, not in the model.**
   - the culprit has a lie
   - at least one clue contradicts that lie, so every case is *solvable*
   - every reference in the case is valid
-- **Same rules everywhere:** the Truth Engine is shared logic, ported to Kotlin so Android follows the same rules, and covered by **19 unit tests** (14 web + 5 Android).
+- **Same rules everywhere:** the Truth Engine is shared logic, ported to Kotlin so Android follows the same rules, and covered by **31 unit tests** (22 web Vitest, 5 Android JUnit, 4 Swift XCTest): the same Truth Engine on web, Android and iOS.
 
 ## Challenges we ran into
 - **Small models drift.** Nano sometimes switched languages, and an innocent suspect once "helpfully" placed the culprit at the scene, even using his surname to get around the name check. Each failure became a Truth Engine rule plus a test.
@@ -93,14 +102,15 @@ LLMs drift, so in Raaz **the facts live in code, not in the model.**
 - More cities and regional languages (Punjabi, Sindhi, Pashto).
 
 ## Built with
-firebase-ai-logic, gemini-nano, gemini, chrome-built-in-ai, firebase-app-check, firebase-hosting, react, typescript, vite, pwa, workbox, kotlin, jetpack-compose, android, vitest, junit
+firebase-ai-logic, gemini-nano, gemini, chrome-built-in-ai, firebase-app-check, firebase-hosting, react, typescript, vite, pwa, workbox, kotlin, jetpack-compose, android, swift, swiftui, ios, apple-foundation-models, cloud-firestore, firebase-auth, web-speech-api, vitest, junit, xctest
 
 ## Built during the submission period
-Raaz started as a web prototype and Android port shortly before the submission period opened (Nov 11, 1:30 PM PT); that earlier work (web game, Truth Engine, Android app, a first iOS version) is visible in the git history with its real dates. During the submission period we added:
+Raaz started as a web prototype and Android port on Nov 11, 2026, a few hours before the submission period opened (Nov 11, 1:30 PM PT); that earlier work (web game, Truth Engine, Android app, a first iOS version) is visible in the git history with its real dates. During the submission period we added:
 - Voice interrogation (speech in, speech out, English and Urdu)
 - Today's case with a Firestore leaderboard and security rules
 - Classroom mode with class boards and the Detective skills reasoning report
 - **iOS on Firebase's official hybrid bridge:** Raaz iOS now uses Apple's Foundation Models `LanguageModelSession` for both paths: Apple's on-device model 🔒 and Gemini via Firebase AI Logic's `GeminiLanguageModel` ☁️ (iOS 27 / Xcode 27).
-- (list continues as work lands)
+- **Voices that match each suspect** (female and male voices from the case file, and from the AI Case Writer)
+- 31 unit tests across web, Android and iOS
 
 We used AI coding assistants (Claude Code) as development tools, as the rules allow. All cases and people are fictional.

@@ -36,7 +36,7 @@ cd web
 cp .env.example .env   # fill in your Firebase web config
 npm install
 npm run dev
-npm test               # 20 tests: Truth Engine, daily case, classroom report
+npm test               # 22 tests: Truth Engine, daily case, classroom report, voices
 ```
 Firebase setup: enable **AI Logic** (Gemini Developer API), **App Check**, **Anonymous Auth**, **Firestore** (`firebase deploy --only firestore` for rules and index). Spark (free) plan is enough.
 For on-device AI use desktop Chrome with the Prompt API / Gemini Nano available.

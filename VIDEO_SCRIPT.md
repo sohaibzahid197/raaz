@@ -4,7 +4,7 @@
 - Desktop Chrome on your Mac (Gemini Nano works here), window about 1440 px wide, zoom 110%.
 - Open the live site https://raaz-4ce63.web.app and do one warm-up question first, so Nano is already loaded.
 - Do **not** reuse a finished case: clear site data or use a fresh profile so the notebook starts empty.
-- Have the Android emulator or your phone ready for shot 7.
+- Have the Android emulator and the iOS simulator (Raaz already installed) open and ready.
 - Record with QuickTime (File → New Screen Recording) and your mic, or record the voice separately and lay it over.
 - Speak slowly. Every claim below has been checked to be true.
 
@@ -31,30 +31,40 @@ Then type: *"Who was at the back counter when the lights came back?"* The clue d
 **Voice:**
 > "Sana's answer just broke Farhan's alibi, and the notebook flags it. Farhan is the culprit, and the AI is holding his lie under pressure. It won't confess, however hard I push."
 
-### 1:30–1:55 · The Truth Engine
-**Screen:** split view or a quick cut to code: `truth.ts` (`checkReply`), then the terminal running `npm test` with **14 passed**.
+### 1:30–1:45 · The Truth Engine
+**Screen:** quick cut to `truth.ts` (`checkReply`), then the terminal running `npm test` with **22 passed**.
 **Voice:**
-> "Small models drift, so in Raaz the facts live in code. Each suspect only knows its own part of the case. Every reply is checked before you see it: no confessions, no breaking character, and no innocent suspect inventing hints. Cases have to be fair, and it's all covered by unit tests."
+> "Small models drift, so the facts live in code. Every reply is checked before you see it: no confessions, no breaking character. 31 tests across web, Android and iOS."
 
-### 1:55–2:15 · Accuse and score
-**Screen:** **Make an accusation** → Farhan → *Gambling debt* → the back-counter clue → **Accuse** → **110/110 · Master Detective**, then the story reveal.
+### 1:45–1:58 · Accuse and score
+**Screen:** **Make an accusation** → Farhan → *Gambling debt* → the back-counter clue → **Accuse** → **Master Detective**, the skills report, then **Post to today's board**.
 **Voice:**
-> "Suspect, motive, proof. Solved."
+> "Suspect, motive, proof. Solved, and on today's leaderboard."
 
-### 2:15–2:35 · The cloud writes new cases
-**Screen:** home → **Write a new case**, choose **Karachi** and type a theme, for example *"a rickshaw rally"*. A new case appears in about 8 seconds with the ☁️ badge.
+### 1:58–2:18 · iPhone: Apple's model through Firebase
+**Screen:** the iOS simulator (iPhone, iOS 27): home shows **"Apple on-device model ready 🔒"**, open Sana, ask a question, zoom on **🔒 On-device**.
 **Voice:**
-> "When you run out of cases, the cloud takes over. Writing a full mystery needs a bigger model, so the Case Writer runs on Gemini in the cloud. Then the Truth Engine checks the case is solvable before you can play it. That's the hybrid split: chat on the device, creation in the cloud."
+> "On iPhone, suspects run on Apple's on-device Foundation Model, through Firebase AI Logic, with Gemini as the cloud fallback in the same Apple session."
 
-### 2:35–2:45 · Android and offline
-**Screen:** 3 seconds of the Android app (Bilal answering, ☁️ badge). Then the browser with DevTools → Network → **Offline**: reload, the game still opens, and a suspect answers 🔒.
+### 2:18–2:32 · Voice and classroom
+**Screen:** web, **🔊 Voice on**, tap 🎤 and ask out loud (try Urdu); the suspect answers aloud. Cut to the home page **Classroom** section with a class code and its board.
 **Voice:**
-> "There's also a native Android app with the same rules, and it falls back to the cloud on phones without Nano. On the web it's installable and plays offline."
+> "Ask by voice in English or Urdu, and every suspect answers in their own voice. Teachers can run the daily case as a class, with a reasoning report for each student."
 
-### 2:45–2:55 · Close
-**Screen:** logo with the URL `raaz-4ce63.web.app`.
+### 2:32–2:45 · The cloud writes new cases
+**Screen:** home → **Write a new case**, Karachi, *"a rickshaw rally"* → new case with ☁️.
 **Voice:**
-> "Raaz. Built with Firebase AI Logic for zero cost. One of them is lying. Can you find out who?"
+> "Writing a whole mystery needs a bigger model, so the Case Writer runs in the cloud, and the Truth Engine checks it's solvable. Chat on the device, creation in the cloud."
+
+### 2:45–2:50 · Android
+**Screen:** 4 seconds of the Android app answering.
+**Voice:**
+> "Same game, same rules, natively on Android."
+
+### 2:50–2:58 · Close
+**Screen:** logo with `raaz-4ce63.web.app`.
+**Voice:**
+> "Raaz. Hybrid on every platform: private and instant on the device, creative in the cloud. One of them is lying. Can you find out who?"
 
 ---
 
@@ -63,4 +73,4 @@ Then type: *"Who was at the back counter when the lights came back?"* The clue d
 - Add a quiet tabla or suspense track under the voice: YouTube Audio Library, free.
 - Cut all waiting time. If a reply takes several seconds, speed up that clip.
 - Make the 🔒 / ☁️ badges big on screen (zoom in when editing). That's the hybrid story judges look for.
-- Upload to YouTube as **Unlisted** or **Public** (follow the rules once they're posted) and paste the link into Devpost.
+- Upload to YouTube as **Public** (the rules require it) and paste the link into Devpost.
