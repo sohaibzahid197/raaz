@@ -25,7 +25,7 @@ const L = {
     noScores: 'No scores yet. Be the first.', classroom: 'Classroom mode', classSub: 'Teachers: give students a class code. Everyone plays today\'s case and you see the class board and each student\'s reasoning.',
     name: 'Your name', code: 'Class code (optional)', viewClass: 'Show class board', badCode: 'Use 4–8 letters or numbers.',
     listen: 'Speak your question', listening: 'Listening…', voiceOn: 'Voice on', voiceOff: 'Voice off',
-    report: 'Detective skills', post: 'Post score to board', posted: 'Score posted', postErr: 'Could not post (offline?)', firstOnly: 'Only your first attempt at today\'s case goes on the board.',
+    report: 'Detective skills', post: 'Post score to board', posted: 'Score posted', postErr: 'Could not post (offline?)', noAnswer: 'Couldn\'t reach the suspect. Check your connection and ask again.', firstOnly: 'Only your first attempt at today\'s case goes on the board.',
   },
   ur: {
     tag: 'ہر مشتبہ ایک اے آئی ہے۔ ان میں سے ایک جھوٹ بول رہا ہے۔', cases: 'کیس فائلیں', play: 'کیس کھولیں', newCase: 'نیا کیس لکھیں',
@@ -40,7 +40,7 @@ const L = {
     noScores: 'ابھی کوئی سکور نہیں۔ پہلے آپ بنیں۔', classroom: 'کلاس روم موڈ', classSub: 'استاد طلبہ کو کلاس کوڈ دیں۔ سب آج کا کیس کھیلیں اور آپ کلاس بورڈ اور ہر طالب علم کی سوچ دیکھیں۔',
     name: 'آپ کا نام', code: 'کلاس کوڈ (اختیاری)', viewClass: 'کلاس بورڈ دیکھیں', badCode: '4 سے 8 حروف یا ہندسے۔',
     listen: 'بول کر پوچھیں', listening: 'سن رہا ہے…', voiceOn: 'آواز آن', voiceOff: 'آواز بند',
-    report: 'جاسوسی مہارتیں', post: 'سکور بورڈ پر بھیجیں', posted: 'سکور بھیج دیا', postErr: 'نہیں بھیج سکے (آف لائن؟)', firstOnly: 'آج کے کیس میں صرف پہلی کوشش بورڈ پر جاتی ہے۔',
+    report: 'جاسوسی مہارتیں', post: 'سکور بورڈ پر بھیجیں', posted: 'سکور بھیج دیا', postErr: 'نہیں بھیج سکے (آف لائن؟)', noAnswer: 'مشتبہ تک بات نہیں پہنچی۔ کنکشن دیکھ کر دوبارہ پوچھیں۔', firstOnly: 'آج کے کیس میں صرف پہلی کوشش بورڈ پر جاتی ہے۔',
   },
 };
 
@@ -155,7 +155,7 @@ export default function App() {
       if (voice) speak(r.text, lang, cf.suspects.indexOf(current), genderOf(current));
     } catch (e) {
       console.warn(e);
-      setTalks((tk) => ({ ...tk, [current.id]: [...withQ, { who: 'suspect', text: '…' }] }));
+      setTalks((tk) => ({ ...tk, [current.id]: [...withQ, { who: 'suspect', text: t.noAnswer }] }));
       setBusy(false);
       return; // no answer, so no clue
     }
