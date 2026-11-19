@@ -1,7 +1,7 @@
 import { getAI, getGenerativeModel, GoogleAIBackend, InferenceMode, type GenerativeModel } from 'firebase/ai';
 import { app } from '../firebase';
 import type { CaseFile, Suspect } from '../engine/types';
-import { checkReply, validateCase } from '../engine/truth';
+import { checkReply, validateCase, sanitizeCase } from '../engine/truth';
 
 export type RanOn = 'device' | 'cloud';
 export interface Turn { who: 'you' | 'suspect'; text: string; ranOn?: RanOn }
@@ -43,17 +43,19 @@ function suspectPrompt(c: CaseFile, s: Suspect, history: Turn[], question: strin
 }
 
 /** Ask a suspect. Runs on-device when possible; Truth Engine rejects bad replies and retries once. */
-export async function askSuspect(c: CaseFile, s: Suspect, history: Turn[], question: string, lang: 'en' | 'ur') {
+export async function askSuspect(c: CaseFile, s: Suspect, history: Turn[], question: string, lang: 'en' | 'ur', mustSay: string[] = []) {
   let last = { text: '', ranOn: 'device' as RanOn };
   for (const strict of [false, true]) {
-    const res = await suspectModel.generateContent(suspectPrompt(c, s, history, question, lang, strict));
+    const say = mustSay.length ? `\nThe detective's question touches something you saw. In your answer you MUST tell them this, in your own words and in first person: ${mustSay.join(' ')}\n` : '';
+    const res = await suspectModel.generateContent(suspectPrompt(c, s, history, question, lang, strict).replace(/(Detective: [^\n]*\n[^\n]*:)$/, (m) => say + m));
     const text = res.response.text().trim().replace(/^["']|["']$/g, '').replace(new RegExp(`^${s.name}:\\s*`), '').replace(/[*_]+/g, '');
     const ranOn: RanOn = res.response.inferenceSource === 'on_device' ? 'device' : 'cloud';
     last = { text, ranOn };
     if (checkReply(c, s, text).ok) return { ...last, retried: strict };
   }
   // Safe fallback line if both attempts failed the check.
-  return { text: s.isCulprit ? `I have told you everything, detective. ${s.lie}` : `I've told you what I know. ${s.knows[0]}`, ranOn: last.ranOn, retried: true };
+  const fact = mustSay.length ? mustSay.join(' ') : s.knows[0];
+  return { text: s.isCulprit ? `Detective, I have told you everything. ${s.lie}` : `Detective, all I can tell you is this. ${fact}`, ranOn: last.ranOn, retried: true };
 }
 
 /** Cloud Case Writer: generates a brand-new case and validates it with the Truth Engine. */
@@ -67,7 +69,7 @@ export async function writeCase(city: string, theme: string): Promise<{ caseFile
   const prompt =
     `Write an original, fair, non-violent mystery (theft, sabotage or disappearance; no death or gore) set in ${city}, Pakistan. Theme: ${theme}. ` +
     `Exactly 4 suspects, exactly 1 culprit. 6 clues spread across the 3 innocent suspects and the culprit; at least 2 clues must contradict the culprit's lie. ` +
-    `Innocent suspects each have a harmless personal secret as a red herring. Use realistic local names, places and details. All people are fictional. ` +
+    `Innocent suspects each have a harmless personal secret as a red herring. Use realistic local names, places and details. All people are fictional. The victim or owner of the stolen item must NOT be one of the 4 suspects. Spell every place name the same way in the title and the story. Clue keywords must be topics (times, places, objects), never a person's name. ` +
     `Return only JSON matching: ${schema}`;
   for (let i = 0; i < 2; i++) {
     const res = await writerModel.generateContent(prompt);
@@ -76,7 +78,7 @@ export async function writeCase(city: string, theme: string): Promise<{ caseFile
       const raw = res.response.text();
       const parsed = JSON.parse(raw.slice(raw.indexOf('{'), raw.lastIndexOf('}') + 1));
       parsed.id = `${parsed.id || 'case'}-${Date.now().toString(36)}`;
-      if (validateCase(parsed).length === 0) return { caseFile: parsed as CaseFile, ranOn };
+      if (validateCase(parsed).length === 0) return { caseFile: sanitizeCase(parsed as CaseFile), ranOn };
       console.warn('Case rejected by Truth Engine:', validateCase(parsed));
     } catch (e) {
       console.warn('Case JSON parse failed', e);

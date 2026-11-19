@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { STARTER_CASES } from './cases';
-import { checkReply, contradictions, revealClues, scoreAccusation, validateCase } from './truth';
+import { checkReply, contradictions, revealClues, sanitizeCase, scoreAccusation, validateCase } from './truth';
 
 const anarkali = STARTER_CASES[0];
 const sana = anarkali.suspects.find((s) => s.id === 'sana')!;
@@ -76,5 +76,26 @@ describe('validateCase', () => {
     const bad = structuredClone(anarkali);
     bad.clues = bad.clues.map((c) => ({ ...c, contradicts: undefined }));
     expect(validateCase(bad)).toContain('no clue contradicts the culprit (unfair case)');
+  });
+});
+
+describe('AI case clean-up', () => {
+  it('drops clue keywords that are only a suspect name', () => {
+    const c = structuredClone(STARTER_CASES[0]);
+    c.clues[0].keywords = ['farhan', 'power', 'farhan qureshi'];
+    expect(sanitizeCase(c).clues[0].keywords).toEqual(['power']);
+  });
+  it('keeps a clue usable if every keyword was a name', () => {
+    const c = structuredClone(STARTER_CASES[0]);
+    c.clues[0].keywords = ['farhan'];
+    expect(sanitizeCase(c).clues[0].keywords).toEqual(['farhan']);
+  });
+});
+
+describe('innocent witnesses', () => {
+  it('may name the culprit when it is their own clue', () => {
+    const c = STARTER_CASES[0];
+    const bilal = c.suspects.find((s) => s.id === 'bilal')!;
+    expect(checkReply(c, bilal, 'Farhan sahib went out for chai around 7:20, detective.').ok).toBe(true);
   });
 });

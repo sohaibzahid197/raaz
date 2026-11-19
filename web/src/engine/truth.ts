@@ -38,7 +38,8 @@ export function checkReply(c: CaseFile, s: Suspect, reply: string): ReplyCheck {
     }
     // Innocents may only talk about the culprit if their own facts mention them.
     const parts = culprit.name.toLowerCase().split(/\s+/).filter((p) => p.length > 2);
-    const knowsCulprit = s.knows.some((k) => parts.some((p) => k.toLowerCase().includes(p)));
+    const ownFacts = [...s.knows, ...c.clues.filter((cl) => cl.from === s.id).map((cl) => cl.text)];
+    const knowsCulprit = ownFacts.some((k) => parts.some((p) => k.toLowerCase().includes(p)));
     if (!knowsCulprit && parts.some((p) => new RegExp(`\\b${p}\\b`, 'i').test(reply))) return { ok: false, reason: 'invented fact about culprit' };
   }
   if (reply.split(/\s+/).length > 90) return { ok: false, reason: 'too long' };
@@ -57,6 +58,15 @@ export function scoreAccusation(c: CaseFile, a: Accusation, questionsAsked: numb
   if (culprit && questionsAsked <= 12) points += 10; // efficient detective bonus
   const rank = points >= 100 ? 'Master Detective' : points >= 80 ? 'Inspector' : points >= 60 ? 'Sergeant' : 'Constable';
   return { points, max: 110, culprit, motive, clue, rank };
+}
+
+/** Clean an AI-written case: drop clue keywords that are just a suspect's name, so naming someone can't unlock the key clue. */
+export function sanitizeCase(c: CaseFile): CaseFile {
+  const names = new Set(c.suspects.flatMap((s) => s.name.toLowerCase().replace(/['"()]/g, ' ').split(/\s+/)).filter((w) => w.length > 2));
+  return { ...c, clues: c.clues.map((cl) => {
+    const kept = cl.keywords.filter((k) => !k.toLowerCase().split(/\s+/).every((w) => names.has(w)));
+    return { ...cl, keywords: kept.length ? kept : cl.keywords };
+  }) };
 }
 
 /** Validate a case file (used for cloud-generated cases). Returns error list; empty means valid. */

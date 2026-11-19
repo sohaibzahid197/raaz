@@ -25,7 +25,7 @@ const L = {
     noScores: 'No scores yet. Be the first.', classroom: 'Classroom mode', classSub: 'Teachers: give students a class code. Everyone plays today\'s case and you see the class board and each student\'s reasoning.',
     name: 'Your name', code: 'Class code (optional)', viewClass: 'Show class board', badCode: 'Use 4–8 letters or numbers.',
     listen: 'Speak your question', listening: 'Listening…', voiceOn: 'Voice on', voiceOff: 'Voice off',
-    report: 'Detective skills', post: 'Post score to board', posted: 'Score posted', postErr: 'Could not post (offline?)',
+    report: 'Detective skills', post: 'Post score to board', posted: 'Score posted', postErr: 'Could not post (offline?)', firstOnly: 'Only your first attempt at today\'s case goes on the board.',
   },
   ur: {
     tag: 'ہر مشتبہ ایک اے آئی ہے۔ ان میں سے ایک جھوٹ بول رہا ہے۔', cases: 'کیس فائلیں', play: 'کیس کھولیں', newCase: 'نیا کیس لکھیں',
@@ -40,7 +40,7 @@ const L = {
     noScores: 'ابھی کوئی سکور نہیں۔ پہلے آپ بنیں۔', classroom: 'کلاس روم موڈ', classSub: 'استاد طلبہ کو کلاس کوڈ دیں۔ سب آج کا کیس کھیلیں اور آپ کلاس بورڈ اور ہر طالب علم کی سوچ دیکھیں۔',
     name: 'آپ کا نام', code: 'کلاس کوڈ (اختیاری)', viewClass: 'کلاس بورڈ دیکھیں', badCode: '4 سے 8 حروف یا ہندسے۔',
     listen: 'بول کر پوچھیں', listening: 'سن رہا ہے…', voiceOn: 'آواز آن', voiceOff: 'آواز بند',
-    report: 'جاسوسی مہارتیں', post: 'سکور بورڈ پر بھیجیں', posted: 'سکور بھیج دیا', postErr: 'نہیں بھیج سکے (آف لائن؟)',
+    report: 'جاسوسی مہارتیں', post: 'سکور بورڈ پر بھیجیں', posted: 'سکور بھیج دیا', postErr: 'نہیں بھیج سکے (آف لائن؟)', firstOnly: 'آج کے کیس میں صرف پہلی کوشش بورڈ پر جاتی ہے۔',
   },
 };
 
@@ -98,6 +98,21 @@ export default function App() {
   const [posted, setPosted] = useState<'' | 'ok' | 'err'>('');
   const [voice, setVoice] = useState(() => ls('raaz.voice') === '1');
   const [hearing, setHearing] = useState(false);
+  const [firstDaily, setFirstDaily] = useState(false);
+
+  // Keep progress across refreshes: one saved game (case, chats, clues, questions).
+  useEffect(() => {
+    if (!cf || screen === 'home' || screen === 'result') return;
+    lsSet('raaz.progress', JSON.stringify({ id: cf.id, isDaily, talks, found, asked }));
+  }, [cf, isDaily, talks, found, asked, screen]);
+  useEffect(() => {
+    try {
+      const p = JSON.parse(ls('raaz.progress') || 'null');
+      const c = p && [...STARTER_CASES, ...generated].find((x) => x.id === p.id);
+      if (c) open(c, p.isDaily);
+    } catch { /* no saved game */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const up = () => setOnline(true), down = () => setOnline(false);
@@ -122,7 +137,10 @@ export default function App() {
 
   function open(c: CaseFile, dailyMode = false) {
     setIsDaily(dailyMode); setPosted(''); stopSpeaking();
-    setCf(c); setTalks({}); setFound([]); setAsked(0); setScore(null); setAcc({ suspectId: '', motive: '', clueId: '' }); setScreen('board');
+    let saved: { id: string; talks: Record<string, Turn[]>; found: string[]; asked: number } | null = null;
+    try { saved = JSON.parse(ls('raaz.progress') || 'null'); } catch { saved = null; }
+    const resume = saved && saved.id === c.id ? saved : null;
+    setCf(c); setTalks(resume?.talks ?? {}); setFound(resume?.found ?? []); setAsked(resume?.asked ?? 0); setScore(null); setAcc({ suspectId: '', motive: '', clueId: '' }); setScreen('board');
   }
 
   async function send(text: string) {
@@ -132,12 +150,14 @@ export default function App() {
     setTalks({ ...talks, [current.id]: withQ }); setQ(''); setBusy(true); setAsked((n) => n + 1);
     const newClues = revealClues(cf, current.id, text, found);
     try {
-      const r = await askSuspect(cf, current, hist, text, lang);
+      const r = await askSuspect(cf, current, hist, text, lang, newClues.map((c) => c.text));
       setTalks((tk) => ({ ...tk, [current.id]: [...withQ, { who: 'suspect', text: r.text, ranOn: r.ranOn }] }));
       if (voice) speak(r.text, lang, cf.suspects.indexOf(current), genderOf(current));
     } catch (e) {
       console.warn(e);
       setTalks((tk) => ({ ...tk, [current.id]: [...withQ, { who: 'suspect', text: '…' }] }));
+      setBusy(false);
+      return; // no answer, so no clue
     }
     if (newClues.length) setFound((f) => [...f, ...newClues.map((c) => c.id)]);
     setBusy(false);
@@ -179,7 +199,13 @@ export default function App() {
 
   function accuse() {
     if (!cf) return;
-    setScore(scoreAccusation(cf, acc, asked)); setScreen('result');
+    const sc = scoreAccusation(cf, acc, asked);
+    // Today's case: only the first accusation can be posted (the result screen reveals the answer).
+    const key = `raaz.daily.${today}`;
+    setFirstDaily(isDaily && !ls(key));
+    if (isDaily && !ls(key)) lsSet(key, String(sc.points));
+    lsSet('raaz.progress', '');
+    setScore(sc); setScreen('result');
   }
 
   return (
@@ -326,7 +352,8 @@ export default function App() {
               <div key={k.key} className="skill"><b>{k.label}</b><span className="stars">{'★'.repeat(k.stars)}{'☆'.repeat(3 - k.stars)}</span><p className="muted small">{k.tip}</p></div>
             ))}
           </section>
-          {isDaily && online && (
+          {isDaily && online && !firstDaily && <p className="muted small">{t.firstOnly}</p>}
+          {isDaily && online && firstDaily && (
             <section className="card">
               <div className="row">
                 <label>{t.name}<input value={player} maxLength={20} onChange={(e) => setPlayer(e.target.value)} /></label>

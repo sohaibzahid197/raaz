@@ -26,7 +26,7 @@ export interface Skill { key: 'questioning' | 'evidence' | 'logic' | 'motive'; l
 export function reasoningReport(c: CaseFile, a: Accusation, s: Score, questions: number, found: string[]): Skill[] {
   const contradicting = c.clues.filter((x) => x.contradicts && found.includes(x.id));
   const pickedClue = c.clues.find((x) => x.id === a.clueId);
-  const q: Skill['stars'] = questions <= 12 ? 3 : questions <= 20 ? 2 : 1;
+  const q: Skill['stars'] = questions === 0 ? 1 : questions <= 12 ? 3 : questions <= 20 ? 2 : 1;
   const ev: Skill['stars'] = found.length >= Math.ceil(c.clues.length * 0.66) ? 3 : found.length >= 2 ? 2 : 1;
   const lo: Skill['stars'] = s.culprit && s.clue ? 3 : contradicting.length > 0 ? 2 : 1;
   const mo: Skill['stars'] = s.motive ? 3 : s.culprit ? 2 : 1;
