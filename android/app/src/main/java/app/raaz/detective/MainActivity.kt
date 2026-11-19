@@ -1,5 +1,11 @@
 package app.raaz.detective
 
+import androidx.compose.ui.text.input.ImeAction
+
+import androidx.compose.foundation.text.KeyboardOptions
+
+import androidx.compose.foundation.text.KeyboardActions
+
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -53,7 +59,7 @@ private fun Game(cases: List<CaseFile>) {
     var found by remember { mutableStateOf(setOf<String>()) }
     var urdu by remember { mutableStateOf(false) }
     val asked = chats.values.sumOf { l -> l.count { it.fromYou } }
-    BackHandler(screen != Screen.Home) { screen = if (screen == Screen.Board) Screen.Home else Screen.Board }
+    BackHandler(screen != Screen.Home) { screen = if (screen == Screen.Board || screen is Screen.Result) Screen.Home else Screen.Board }
 
     Column(Modifier.fillMaxSize().systemBarsPadding().imePadding().padding(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -141,16 +147,19 @@ private fun Game(cases: List<CaseFile>) {
             if (busy) item { Text("${s.name} is thinking…", color = Muted) }
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
-            OutlinedTextField(q, { q = it }, Modifier.weight(1f), placeholder = { Text("Ask ${s.name.split(" ")[0]}…") }, singleLine = true)
-            Button(enabled = q.isNotBlank() && !busy, modifier = Modifier.padding(start = 8.dp), onClick = {
+            val send = {
                 val question = q.trim(); q = ""; busy = true
                 onTurn(Turn(true, question)); onQuestion(question)
                 scope.launch {
                     val r = runCatching { Ai.ask(c, s, turns + Turn(true, question), question, urdu) }
-                    onTurn(r.fold({ Turn(false, it.text, it.onDevice) }, { Turn(false, "(No answer: ${it.message?.take(80)})") }))
+                    onTurn(r.fold({ Turn(false, it.text, it.onDevice) }, { Turn(false, "…(no answer, check your connection and ask again)") }))
                     busy = false
                 }
-            }) { Text("Ask") }
+            }
+            OutlinedTextField(q, { q = it }, Modifier.weight(1f), placeholder = { Text("Ask ${s.name.split(" ")[0]}…") }, singleLine = true,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
+                keyboardActions = KeyboardActions(onSend = { if (q.isNotBlank() && !busy) send() }))
+            Button(enabled = q.isNotBlank() && !busy, modifier = Modifier.padding(start = 8.dp), onClick = { send() }) { Text("Ask") }
         }
     }
 }
@@ -165,7 +174,7 @@ private fun Game(cases: List<CaseFile>) {
         if (found.isEmpty()) Text("No clues yet. Question the suspects first.", color = Lantern, fontSize = 13.sp)
         c.clues.filter { it.id in found }.forEach { x -> Pick(x.text, cl == x.id) { cl = x.id } }
         Button(onClick = { done(sid!!, mot!!, cl!!) }, enabled = sid != null && mot != null && cl != null,
-            colors = ButtonDefaults.buttonColors(containerColor = Blood), modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp)) { Text("Accuse", color = Color.White) }
+            colors = ButtonDefaults.buttonColors(containerColor = Blood), modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp)) { Text("Accuse") }
     }
 }
 
