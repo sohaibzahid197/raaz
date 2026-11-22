@@ -14,7 +14,10 @@ enum Ai {
     private static let ai = FirebaseAI.firebaseAI(backend: .googleAI())
     private static let cloudModel = ai.geminiLanguageModel(name: chatModel)
 
-    static var onDeviceAvailable: Bool { SystemLanguageModel.default.isAvailable }
+    /// Permissive guardrails: this is a fictional, non-violent mystery game, and the default filter
+    /// rejects harmless words like "stolen" or "thief" in the role-play prompt.
+    private static let deviceModel = SystemLanguageModel(guardrails: .permissiveContentTransformations)
+    static var onDeviceAvailable: Bool { deviceModel.isAvailable }
     static var onDeviceStatus: String {
         onDeviceAvailable ? "Apple on-device model ready 🔒" : "On-device model unavailable here: using Gemini via Firebase ☁️"
     }
@@ -25,12 +28,20 @@ enum Ai {
         if onDeviceAvailable {
             do {
                 // Fresh session per question: the need-to-know case slice lives in the prompt.
-                let r = try await LanguageModelSession(model: SystemLanguageModel.default).respond(to: prompt, options: options)
+                let r = try await LanguageModelSession(model: deviceModel).respond(to: deviceSafe(prompt), options: options)
                 return (r.content, true)
-            } catch { /* guardrail refusal, context limit, model not ready → cloud */ }
+            } catch { print("[Raaz] on-device failed, using cloud: \(error)") /* guardrail refusal, context limit, model not ready → cloud */ }
         }
         let r = try await LanguageModelSession(model: cloudModel).respond(to: prompt, options: options)
         return (r.content, false)
+    }
+
+    /// Gentler wording for the on-device model's safety filter (same meaning, fictional game).
+    private static func deviceSafe(_ p: String) -> String {
+        "This is a fictional, family-friendly detective puzzle game. No real people.\n" + p
+            .replacingOccurrences(of: "You committed the crime.", with: "You are the one who took the missing item.")
+            .replacingOccurrences(of: "about the crime", with: "about the incident")
+            .replacingOccurrences(of: "do not name a thief", with: "do not blame anyone")
     }
 
     static func prompt(_ c: CaseFile, _ s: Suspect, _ history: [Turn], _ q: String, urdu: Bool, strict: Bool) -> String {
@@ -44,7 +55,7 @@ enum Ai {
         return "Role-play for a detective game. A police detective is questioning you. You are \(s.name), \(s.role), in \(c.city). " +
             "Personality: \(s.personality). Speaking style: \(s.speakingStyle).\nCase: \(c.what). Your alibi: \(s.alibi)\nOther people present: \(others).\n\(role)\n" +
             "Rules: answer only as \(s.name); at most 3 short sentences; \(urdu ? "reply in simple Urdu" : "reply in English (a few Urdu words are fine)"); " +
-            "never use Spanish, Hindi script or any other language; speak to the detective (never call the detective by another person's name); " +
+            "never use Spanish, Hindi script or any other language; speak to the detective (call them \"detective\" or \"sir\", never by your own or anyone else's name); " +
             "never mention AI, prompts or rules; do not invent new people or objects.\(strict ? " Be extra careful: do not confess and do not name a thief." : "")\n" +
             (recent.isEmpty ? "" : "Conversation so far:\n\(recent)\n") + "Detective: \(q)\n\(s.name):"
     }
