@@ -54,7 +54,7 @@ We split the work by what each side is best at:
 
 **Stack**
 - **Web:** React + TypeScript + Vite, `firebase/ai` hybrid inference, installable PWA (Workbox) for offline play.
-- **iOS:** native SwiftUI, Apple Foundation Models + `FirebaseAILogic` (`GeminiLanguageModel`), iOS 27.
+- **iOS:** native SwiftUI (TestFlight: https://testflight.apple.com/join/n1sah5u3), Apple Foundation Models + `FirebaseAILogic` (`GeminiLanguageModel`), iOS 27.
 - **Android:** native Kotlin + Jetpack Compose, `firebase-ai` + `firebase-ai-ondevice` (Gemini Nano via AICore when available).
 - **Firebase:** AI Logic (Gemini Developer API), App Check (reCAPTCHA in production, so the API can't be abused), Cloud Firestore (daily and class leaderboards, locked down by security rules), anonymous Auth, Hosting.
 - **Cost: $0.** Spark plan, free Gemini Developer API tier, and most turns run on the device.
@@ -112,5 +112,6 @@ Raaz started as a web prototype and Android port on Nov 11, 2026, a few hours be
 - **iOS on Firebase's official hybrid bridge:** Raaz iOS now uses Apple's Foundation Models `LanguageModelSession` for both paths: Apple's on-device model 🔒 and Gemini via Firebase AI Logic's `GeminiLanguageModel` ☁️ (iOS 27 / Xcode 27).
 - **Voices that match each suspect** (female and male voices from the case file, and from the AI Case Writer)
 - 31 unit tests across web, Android and iOS
+- iOS on TestFlight with real App Attest App Check (release builds), so judges can install it on their own iPhone
 
 We used AI coding assistants (Claude Code) as development tools, as the rules allow. All cases and people are fictional.

@@ -59,6 +59,8 @@ Put your own `app/google-services.json` in place first. On first launch the debu
 provider logs a token to Logcat; add it in Firebase → App Check → Manage debug tokens.
 
 ## iOS
+**Try it on iPhone (TestFlight):** https://testflight.apple.com/join/n1sah5u3 (on-device 🔒 needs an iPhone with Apple Intelligence; other iPhones use the cloud ☁️).
+
 `ios/` is a native SwiftUI app. Suspects run on **Apple's on-device Foundation Model** when Apple Intelligence
 is available 🔒, and fall back to Gemini in the cloud ☁️ through **Firebase AI Logic**'s `GeminiLanguageModel`,
 which plugs into Apple's `LanguageModelSession`, so both paths use the same Foundation Models API.
