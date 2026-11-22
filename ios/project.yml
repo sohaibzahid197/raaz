@@ -28,6 +28,12 @@ targets:
         SWIFT_VERSION: "6.0"
         SWIFT_STRICT_CONCURRENCY: minimal
         CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: 4D48Q9Y352
+        CODE_SIGN_ENTITLEMENTS: Raaz/Raaz.entitlements
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.games
+        TARGETED_DEVICE_FAMILY: "1"
   RaazTests:
     type: bundle.unit-test
     platform: iOS
