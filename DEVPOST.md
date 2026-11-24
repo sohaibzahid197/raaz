@@ -77,7 +77,7 @@ LLMs drift, so in Raaz **the facts live in code, not in the model.**
   - the culprit has a lie
   - at least one clue contradicts that lie, so every case is *solvable*
   - every reference in the case is valid
-- **Same rules everywhere:** the Truth Engine is shared logic, ported to Kotlin so Android follows the same rules, and covered by **31 unit tests** (22 web Vitest, 5 Android JUnit, 4 Swift XCTest): the same Truth Engine on web, Android and iOS.
+- **Same rules everywhere:** the Truth Engine is shared logic, ported to Kotlin so Android follows the same rules, and covered by **34 unit tests** (25 web Vitest, 5 Android JUnit, 4 Swift XCTest): the same Truth Engine on web, Android and iOS.
 
 ## Challenges we ran into
 - **Small models drift.** Nano sometimes switched languages, and an innocent suspect once "helpfully" placed the culprit at the scene, even using his surname to get around the name check. Each failure became a Truth Engine rule plus a test.
@@ -111,7 +111,7 @@ Raaz started as a web prototype and Android port on Nov 11, 2026, a few hours be
 - Classroom mode with class boards and the Detective skills reasoning report
 - **iOS on Firebase's official hybrid bridge:** Raaz iOS now uses Apple's Foundation Models `LanguageModelSession` for both paths: Apple's on-device model 🔒 and Gemini via Firebase AI Logic's `GeminiLanguageModel` ☁️ (iOS 27 / Xcode 27).
 - **Voices that match each suspect** (female and male voices from the case file, and from the AI Case Writer)
-- 31 unit tests across web, Android and iOS
+- 34 unit tests across web, Android and iOS
 - iOS on TestFlight with real App Attest App Check (release builds), so judges can install it on their own iPhone
 
 We used AI coding assistants (Claude Code) as development tools, as the rules allow. All cases and people are fictional.

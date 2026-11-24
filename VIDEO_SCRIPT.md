@@ -34,7 +34,7 @@ Then type: *"Who was at the back counter when the lights came back?"* The clue d
 ### 1:30–1:45 · The Truth Engine
 **Screen:** quick cut to `truth.ts` (`checkReply`), then the terminal running `npm test` with **22 passed**.
 **Voice:**
-> "Small models drift, so the facts live in code. Every reply is checked before you see it: no confessions, no breaking character. 31 tests across web, Android and iOS."
+> "Small models drift, so the facts live in code. Every reply is checked before you see it: no confessions, no breaking character. 34 tests across web, Android and iOS."
 
 ### 1:45–1:58 · Accuse and score
 **Screen:** **Make an accusation** → Farhan → *Gambling debt* → the back-counter clue → **Accuse** → **Master Detective**, the skills report, then **Post to today's board**.
