@@ -23,7 +23,7 @@ export const STARTER_CASES: CaseFile[] = [
     suspects: [
       {
         id: 'farhan', gender: 'male', name: 'Farhan Qureshi', role: 'Shop manager', personality: 'smooth, confident, helpful on the surface',
-        speakingStyle: 'calm, uses "bhai" and "dekhiye"', alibi: 'Says he was counting cash at the back counter the whole time.',
+        speakingStyle: 'calm and polite, speaks clear English', alibi: 'Says he was counting cash at the back counter the whole time.',
         knows: ['The spare key is kept in the back drawer.', 'Bilal saw the locket at closing time.'],
         secret: 'He owes a large gambling debt to a moneylender in Ichhra.', isCulprit: true,
         lie: 'I never left the back counter and never touched the spare key. I was counting cash during the power cut.',
