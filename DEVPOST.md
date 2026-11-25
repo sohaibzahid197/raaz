@@ -3,7 +3,7 @@
 **Tagline (Devpost, max 200 chars):**
 A detective game where every suspect is a live AI, interrogated on-device with Gemini Nano, while the cloud writes endless new mysteries — and a Truth Engine makes sure the AI never cheats.
 
-**Play:** https://raaz-4ce63.web.app (desktop Chrome for on-device AI) · **Android:** APK in repo · **Code:** https://github.com/sohaibzahid197/raaz
+**Play:** https://raaz-4ce63.web.app (desktop Chrome for on-device AI) · **iPhone:** https://testflight.apple.com/join/n1sah5u3 · **Android:** APK in repo · **Video:** https://youtu.be/kArn-Alcook · **Code:** https://github.com/sohaibzahid197/raaz
 
 ---
 
@@ -88,7 +88,7 @@ LLMs drift, so in Raaz **the facts live in code, not in the model.**
 ## Accomplishments we're proud of
 - A **real hybrid split with a reason behind it**, not a toggle: chatty, private, offline work on the device; heavy creative generation in the cloud.
 - An AI that **lies on purpose and still plays fair**.
-- **Two platforms:** web PWA plus a native Android app with the same rules.
+- **Three platforms:** web PWA, native Android and native iOS, all with the same rules.
 - **Bilingual (English/Urdu)** and set in real Pakistani places.
 - Runs at **zero cost**.
 
